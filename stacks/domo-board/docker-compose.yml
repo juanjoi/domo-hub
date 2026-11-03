@@ -1,7 +1,7 @@
 # Panel para actualizar los stacks de este repositorio con un botón.
-# Controla todo Docker y no tiene login propio, así que Traefik le pone
-# usuario y contraseña. Si Traefik falla, se entra con un túnel SSH al puerto
-# publicado en el propio servidor.
+# Controla todo Docker y no tiene login: quien llegue a él controla el servidor.
+# Si Traefik falla, se entra con un túnel SSH al puerto publicado en el propio
+# servidor.
 services:
   domo-board:
     image: ghcr.io/juanjoi/domo-board:0.1.0
@@ -27,7 +27,6 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.domo-board.rule=HostRegexp(`^domo-board\.`)
-      - traefik.http.routers.domo-board.middlewares=autenticacion@file
       - traefik.http.services.domo-board.loadbalancer.server.port=8080
     networks:
       - proxy

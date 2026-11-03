@@ -5,7 +5,7 @@ Servicios definidos en este repositorio. Cada servicio se añade como una fila m
 | Servicio | Categoría | Propósito |
 | --- | --- | --- |
 | Traefik | Infraestructura | Proxy inverso: recibe las peticiones web y las reparte según el nombre |
-| domo-board | Infraestructura | Panel para actualizar los stacks con un botón; con usuario y contraseña |
+| domo-board | Infraestructura | Panel para actualizar los stacks con un botón |
 
 Categorías: **Infraestructura**, **Familia**, **Domótica**.
 

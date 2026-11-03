@@ -47,6 +47,7 @@ Todo cambio pasa por Git, salvo los secretos. Lo que se edite a mano en el servi
 ## Reglas de los stacks
 
 - **Datos** en bind mounts con ruta absoluta bajo `/docker/<servicio>`. Los volúmenes con nombre quedan para lo que se puede volver a descargar.
+- **Sin preparar nada a mano:** un stack se despliega desde el panel sin entrar al servidor. Si la imagen no corre como root y necesita que sus carpetas sean de su usuario, el stack incluye un contenedor de preparación que las crea y les da dueño antes de arrancar la aplicación (ver el de File Browser). Lo único que se prepara a mano son los `.env`.
 - **Versiones fijas** en las imágenes, no `latest` ni `stable`.
 - **Secretos** en `.env`, con un `.env.example` versionado que lista los nombres.
 - **Nombres de contenedor** claros y únicos, porque Traefik los usa para encontrarlos.
@@ -75,7 +76,7 @@ Cada servicio publicado declara en su `docker-compose.yml` cómo lo publica Trae
 ```
 
 - **Sin `traefik.enable=true`** no se publica nada: Traefik ignora el resto de contenedores.
-- **La regla mira solo el principio del nombre**, así el dominio no aparece en este repositorio. El nombre completo lo define el registro de Pi-hole.
+- **La regla mira solo el principio del nombre**, así el dominio no aparece en este repositorio. Pi-hole envía al servidor cualquier nombre del dominio interno, así que un servicio nuevo no necesita registro DNS.
 - **El puerto** es el interno del contenedor, siempre explícito.
 - **Sin elegir entrada:** el servicio queda en todas las de Traefik, así que al activar HTTPS las etiquetas no cambian.
 - **El panel de Traefik**, de solo lectura, se publica igual con el nombre `traefik` y muestra qué servicios ha encontrado.

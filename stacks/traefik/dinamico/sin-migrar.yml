@@ -4,9 +4,6 @@
 # Las reglas solo miran el principio del nombre, así el dominio no está en Git.
 http:
   routers:
-    filebrowser:
-      rule: HostRegexp(`^filebrowser\.`)
-      service: filebrowser
     firefly-importer:
       rule: HostRegexp(`^firefly-importer\.`)
       service: firefly-importer
@@ -38,10 +35,6 @@ http:
       rule: HostRegexp(`^zigbee2mqtt\.`)
       service: zigbee2mqtt
   services:
-    filebrowser:
-      loadBalancer:
-        servers:
-          - url: http://filebrowser:8080
     firefly-importer:
       loadBalancer:
         servers:

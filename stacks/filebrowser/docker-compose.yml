@@ -1,0 +1,44 @@
+# Acceso web a ficheros.
+# Si la configuración está vacía, se crea al arrancar y el usuario admin con su
+# contraseña aparecen en el log del contenedor.
+services:
+  # File Browser corre con el usuario 1000: antes de arrancarlo, se crean sus
+  # carpetas y se le dan si no son suyas. Así el stack no necesita preparar
+  # nada a mano en el servidor.
+  filebrowser-permisos:
+    image: busybox:1.37
+    container_name: filebrowser-permisos
+    command:
+      - sh
+      - -c
+      - |
+        for d in database config data-general; do
+          mkdir -p /datos/$$d
+          [ "$$(stat -c %u:%g /datos/$$d)" = 1000:1000 ] || chown -R 1000:1000 /datos/$$d
+        done
+    volumes:
+      - /docker/filebrowser:/datos
+    network_mode: none
+  filebrowser:
+    image: filebrowser/filebrowser:v2.63.23
+    container_name: filebrowser
+    restart: unless-stopped
+    depends_on:
+      filebrowser-permisos:
+        condition: service_completed_successfully
+    environment:
+      - TZ=Europe/Madrid
+    volumes:
+      - /docker/filebrowser/database:/database
+      - /docker/filebrowser/config:/config
+      - /docker/filebrowser/data-general:/srv/general
+      # Al migrar Jellyfin, sus ficheros se añaden aquí en /srv/jellyfin.
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.filebrowser.rule=HostRegexp(`^filebrowser\.`)
+      - traefik.http.services.filebrowser.loadbalancer.server.port=80
+    networks:
+      - proxy
+networks:
+  proxy:
+    external: true

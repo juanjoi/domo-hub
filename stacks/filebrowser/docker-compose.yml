@@ -32,7 +32,8 @@ services:
       - /docker/filebrowser/database:/database
       - /docker/filebrowser/config:/config
       - /docker/filebrowser/data-general:/srv/general
-      # Al migrar Jellyfin, sus ficheros se añaden aquí en /srv/jellyfin.
+      # Películas y series de Jellyfin, que es el dueño de la carpeta.
+      - /docker/jellyfin/media:/srv/jellyfin
     labels:
       - traefik.enable=true
       - traefik.http.routers.filebrowser.rule=HostRegexp(`^filebrowser\.`)

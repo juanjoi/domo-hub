@@ -7,6 +7,7 @@ Servicios definidos en este repositorio. Cada servicio se añade como una fila m
 | Traefik | Infraestructura | Proxy inverso: recibe las peticiones web y las reparte según el nombre |
 | domo-board | Infraestructura | Panel para actualizar los stacks con un botón |
 | File Browser | Familia | Acceso web a los ficheros compartidos |
+| Jellyfin | Familia | Películas y series |
 
 Categorías: **Infraestructura**, **Familia**, **Domótica**.
 

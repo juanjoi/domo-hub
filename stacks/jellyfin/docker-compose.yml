@@ -1,0 +1,46 @@
+# Películas y series.
+# Las películas y series están en /docker/jellyfin/media, que también monta File
+# Browser para subirlas. File Browser corre con el usuario 1000, así que esa
+# carpeta es suya; Jellyfin corre como root y solo la lee.
+services:
+  jellyfin-permisos:
+    image: busybox:1.37
+    container_name: jellyfin-permisos
+    command:
+      - sh
+      - -c
+      - |
+        mkdir -p /datos/config /datos/media
+        [ "$$(stat -c %u:%g /datos/media)" = 1000:1000 ] || chown -R 1000:1000 /datos/media
+    volumes:
+      - /docker/jellyfin:/datos
+    network_mode: none
+  jellyfin:
+    image: jellyfin/jellyfin:12.4
+    container_name: jellyfin
+    restart: unless-stopped
+    depends_on:
+      jellyfin-permisos:
+        condition: service_completed_successfully
+    environment:
+      - TZ=Europe/Madrid
+    volumes:
+      - /docker/jellyfin/config:/config
+      # Miniaturas y transcodificaciones: se regeneran, así que no van en /docker
+      # ni en las copias.
+      - jellyfin-cache:/cache
+      - /docker/jellyfin/media:/media:ro
+    # Gráfica integrada del servidor, para transcodificar con Intel Quick Sync.
+    devices:
+      - /dev/dri:/dev/dri
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.jellyfin.rule=HostRegexp(`^jellyfin\.`)
+      - traefik.http.services.jellyfin.loadbalancer.server.port=8096
+    networks:
+      - proxy
+volumes:
+  jellyfin-cache:
+networks:
+  proxy:
+    external: true

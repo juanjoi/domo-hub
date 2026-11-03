@@ -16,9 +16,6 @@ http:
     immich:
       rule: HostRegexp(`^immich\.`)
       service: immich
-    jellyfin:
-      rule: HostRegexp(`^jellyfin\.`)
-      service: jellyfin
     portainer:
       rule: HostRegexp(`^portainer\.`)
       service: portainer
@@ -51,10 +48,6 @@ http:
       loadBalancer:
         servers:
           - url: http://immich:2283
-    jellyfin:
-      loadBalancer:
-        servers:
-          - url: http://jellyfin:8096
     portainer:
       loadBalancer:
         servers:

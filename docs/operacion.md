@@ -18,9 +18,12 @@ Este repositorio es la fuente de verdad: lo que está en `main` es lo que debe c
    - **Mientras no exista el panel**, por SSH:
 
      ```bash
-     cd <clon del repositorio> && git pull
+     cd <clon del repositorio> && git fetch
+     git restore --source=origin/main --worktree -- stacks/<servicio>/
      docker compose -f stacks/<servicio>/docker-compose.yml up -d
      ```
+
+   No se hace `git pull`: solo se actualiza la carpeta del stack que se despliega, igual que hace el panel. Con `git pull` cambiarían a la vez los ficheros de todos los stacks, y algunos, como las rutas de Traefik, se aplican al momento.
 
 Todo cambio pasa por Git, salvo los secretos. Lo que se edite a mano en el servidor o en Portainer se pierde en el siguiente despliegue.
 

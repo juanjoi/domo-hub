@@ -33,11 +33,14 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       # Configuración versionada en este repositorio, no datos.
       - ./dinamico:/etc/traefik/dinamico:ro
+      # Usuarios de la autenticación, fuera de Git.
+      - /docker/traefik:/etc/traefik/secretos:ro
     labels:
       - traefik.enable=true
       # Panel de Traefik, de solo lectura.
       - traefik.http.routers.traefik.rule=HostRegexp(`^traefik\.`)
       - traefik.http.routers.traefik.service=api@internal
+      - traefik.http.routers.traefik.middlewares=autenticacion@file
     networks:
       - proxy
       # Red anterior a domo-hub, donde siguen los servicios aún sin migrar.

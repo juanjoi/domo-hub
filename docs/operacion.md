@@ -25,6 +25,15 @@ Este repositorio es la fuente de verdad: lo que está en `main` es lo que debe c
 
    No se hace `git pull`: solo se actualiza la carpeta del stack que se despliega, igual que hace el panel. Con `git pull` cambiarían a la vez los ficheros de todos los stacks, y algunos, como las rutas de Traefik, se aplican al momento.
 
+El panel se publica por Traefik con usuario y contraseña (ver [autenticación](#autenticación)). La primera vez se levanta a mano, y después se actualiza a sí mismo:
+
+```bash
+cd /docker/domo-hub
+sudo docker compose -f stacks/domo-board/docker-compose.yml up -d
+```
+
+Si Traefik falla y no se llega al panel, se entra con un túnel SSH al puerto que el panel publica solo en el propio servidor, o se despliega por SSH con los comandos anteriores.
+
 Todo cambio pasa por Git, salvo los secretos. Lo que se edite a mano en el servidor o en Portainer se pierde en el siguiente despliegue.
 
 | Tarea | Cómo se hace |
@@ -70,6 +79,19 @@ Cada servicio publicado declara en su `docker-compose.yml` cómo lo publica Trae
 - **El puerto** es el interno del contenedor, siempre explícito.
 - **Sin elegir entrada:** el servicio queda en todas las de Traefik, así que al activar HTTPS las etiquetas no cambian.
 - **El panel de Traefik**, de solo lectura, se publica igual con el nombre `traefik` y muestra qué servicios ha encontrado.
+
+### Autenticación
+
+Lo que no tiene login propio, como el panel de Traefik y `domo-board`, pasa por un usuario y contraseña que pide Traefik. Una ruta lo activa con una etiqueta más:
+
+```yaml
+      - traefik.http.routers.<servicio>.middlewares=autenticacion@file
+```
+
+- Los usuarios están en `/docker/traefik/usuarios`, en formato `htpasswd` con bcrypt, fuera de Git y dentro de las copias.
+- Para crear o cambiar un usuario, se genera su línea y se añade al fichero: `docker run --rm -it httpd:2.4-alpine htpasswd -nB <usuario>`. Traefik lee el fichero al arrancar, así que después hay que reiniciarlo.
+- Si falta el fichero, Traefik desactiva esas rutas en vez de dejarlas abiertas.
+- Sin HTTPS, la contraseña viaja sin cifrar por la Wi-Fi de casa; desde fuera va cifrada por Tailscale.
 
 ## Bases de datos compartidas
 

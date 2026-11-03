@@ -8,7 +8,7 @@ Este repositorio es la fuente de verdad: lo que está en `main` es lo que debe c
 | --- | --- |
 | Definición de cada stack | `stacks/<servicio>/docker-compose.yml` en este repositorio |
 | Secretos | `.env` junto al compose en el clon del servidor, fuera de Git, y en el gestor de contraseñas |
-| Datos | `/opt/domo/<servicio>` en el servidor, cubierto por las copias de seguridad |
+| Datos | `/docker/<servicio>` en el servidor, cubierto por las copias de seguridad |
 
 ## Desplegar un cambio
 
@@ -34,19 +34,39 @@ Todo cambio pasa por Git, salvo los secretos. Lo que se edite a mano en el servi
 
 ## Reglas de los stacks
 
-- **Datos** en bind mounts con ruta absoluta bajo `/opt/domo/<servicio>`. Los volúmenes con nombre quedan para lo que se puede volver a descargar.
+- **Datos** en bind mounts con ruta absoluta bajo `/docker/<servicio>`. Los volúmenes con nombre quedan para lo que se puede volver a descargar.
 - **Versiones fijas** en las imágenes, no `latest` ni `stable`.
 - **Secretos** en `.env`, con un `.env.example` versionado que lista los nombres.
-- **Nombres de contenedor** claros y únicos, porque Nginx Proxy Manager los usa para encontrarlos.
+- **Nombres de contenedor** claros y únicos, porque Traefik los usa para encontrarlos.
 
 ## Red compartida
 
-Los servicios publicados comparten la red `proxy`, para que Nginx Proxy Manager los alcance por nombre de contenedor. El resto se queda en la red propia de su stack, salvo las bases de datos compartidas.
+Los servicios publicados comparten la red `proxy`, para que Traefik los alcance por nombre de contenedor. El resto se queda en la red propia de su stack, salvo las bases de datos compartidas.
 
-- El stack de Nginx Proxy Manager crea la red, con `name: proxy`, y los demás la declaran como externa. Por eso se despliega antes que ellos.
+- El stack de Traefik crea la red, con `name: proxy`, y los demás la declaran como externa. Por eso se despliega antes que ellos.
 - Los servicios detrás del proxy no publican puertos en el servidor.
-- Home Assistant usa la red del host, así que no está en `proxy` y se llega a él a través del host.
-- Los servicios de voz tampoco están en `proxy`: solo hablan con Home Assistant.
+- Home Assistant está en `proxy`, como cualquier servicio publicado, y en `domotica`.
+- La red `domotica` la crea el stack de Mosquitto (MQTT). En ella están Zigbee2MQTT, Home Assistant y los servicios de voz, que no están en `proxy` porque solo hablan con Home Assistant.
+- Durante la migración, Traefik también está en `services`, la red compartida anterior, para seguir llegando a los servicios que aún no se han migrado. Esos servicios se declaran en `stacks/traefik/dinamico/`. Cada servicio migrado pasa a `proxy` y a sus propias etiquetas.
+
+## Publicar un servicio
+
+Cada servicio publicado declara en su `docker-compose.yml` cómo lo publica Traefik, con etiquetas. Traefik las lee de Docker al arrancar el contenedor, sin reiniciarse.
+
+```yaml
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.<servicio>.rule=HostRegexp(`^<servicio>\.`)
+      - traefik.http.services.<servicio>.loadbalancer.server.port=<puerto interno>
+    networks:
+      - proxy
+```
+
+- **Sin `traefik.enable=true`** no se publica nada: Traefik ignora el resto de contenedores.
+- **La regla mira solo el principio del nombre**, así el dominio no aparece en este repositorio. El nombre completo lo define el registro de Pi-hole.
+- **El puerto** es el interno del contenedor, siempre explícito.
+- **Sin elegir entrada:** el servicio queda en todas las de Traefik, así que al activar HTTPS las etiquetas no cambian.
+- **El panel de Traefik**, de solo lectura, se publica igual con el nombre `traefik` y muestra qué servicios ha encontrado.
 
 ## Bases de datos compartidas
 

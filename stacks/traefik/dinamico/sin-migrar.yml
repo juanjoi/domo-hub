@@ -1,0 +1,84 @@
+# Servicios que aún no están en domo-hub. Traefik los alcanza por la red services.
+# Al migrar uno, se borra de aquí en el mismo cambio en que se le añaden las etiquetas en su stack:
+# si los dos existen a la vez, Traefik tiene dos rutas para el mismo nombre.
+# Las reglas solo miran el principio del nombre, así el dominio no está en Git.
+http:
+  routers:
+    filebrowser:
+      rule: HostRegexp(`^filebrowser\.`)
+      service: filebrowser
+    firefly-importer:
+      rule: HostRegexp(`^firefly-importer\.`)
+      service: firefly-importer
+    firefly:
+      rule: HostRegexp(`^firefly\.`)
+      service: firefly
+    ha:
+      rule: HostRegexp(`^ha\.`)
+      service: ha
+    immich:
+      rule: HostRegexp(`^immich\.`)
+      service: immich
+    jellyfin:
+      rule: HostRegexp(`^jellyfin\.`)
+      service: jellyfin
+    portainer:
+      rule: HostRegexp(`^portainer\.`)
+      service: portainer
+    recetas:
+      rule: HostRegexp(`^recetas\.`)
+      service: recetas
+    vaultwarden:
+      rule: HostRegexp(`^vaultwarden\.`)
+      service: vaultwarden
+    wud:
+      rule: HostRegexp(`^wud\.`)
+      service: wud
+    zigbee2mqtt:
+      rule: HostRegexp(`^zigbee2mqtt\.`)
+      service: zigbee2mqtt
+  services:
+    filebrowser:
+      loadBalancer:
+        servers:
+          - url: http://filebrowser:8080
+    firefly-importer:
+      loadBalancer:
+        servers:
+          - url: http://firefly-importer:8080
+    firefly:
+      loadBalancer:
+        servers:
+          - url: http://firefly:8080
+    ha:
+      loadBalancer:
+        servers:
+          - url: http://homeassistant:8123
+    immich:
+      loadBalancer:
+        servers:
+          - url: http://immich:2283
+    jellyfin:
+      loadBalancer:
+        servers:
+          - url: http://jellyfin:8096
+    portainer:
+      loadBalancer:
+        servers:
+          - url: http://portainer:9000
+    recetas:
+      loadBalancer:
+        servers:
+          - url: http://mealie:9000
+    vaultwarden:
+      loadBalancer:
+        servers:
+          - url: http://vaultwarden:80
+    wud:
+      loadBalancer:
+        servers:
+          - url: http://wud:3000
+    zigbee2mqtt:
+      loadBalancer:
+        servers:
+          - url: http://zigbee2mqtt:8080

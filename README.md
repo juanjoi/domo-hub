@@ -6,7 +6,7 @@ No incluye a propósito IPs, puertos ni credenciales.
 
 ## Visión general
 
-Todo el tráfico web entra por Nginx Proxy Manager, y ningún servicio está expuesto directamente a Internet: desde fuera de casa se entra por Tailscale.
+Todo el tráfico web entra por Traefik, y ningún servicio está expuesto directamente a Internet: desde fuera de casa se entra por Tailscale.
 
 ```mermaid
 flowchart LR
@@ -14,7 +14,7 @@ flowchart LR
     fuera["Fuera de casa<br/><small>móvil, portátil</small>"]
     pihole["Pi-hole<br/><small>DNS de nombres internos</small>"]
     ts["Tailscale<br/><small>VPN, sin abrir puertos</small>"]
-    npm["Nginx Proxy Manager<br/><small>reparte según el nombre</small>"]
+    proxy["Traefik<br/><small>reparte según el nombre</small>"]
 
     subgraph docker["Contenedores Docker"]
         familia["Servicios familiares"]
@@ -22,14 +22,14 @@ flowchart LR
     end
 
     casa -- "1 · DNS" --> pihole
-    casa -- "2 · web" --> npm
+    casa -- "2 · web" --> proxy
     fuera --> ts
-    ts -- "dentro de la red" --> npm
-    npm --> familia
-    npm --> domotica
+    ts -- "dentro de la red" --> proxy
+    proxy --> familia
+    proxy --> domotica
 ```
 
-El dispositivo pregunta primero a Pi-hole por el nombre del servicio y después manda la petición a Nginx Proxy Manager, que la reenvía al contenedor que corresponde.
+El dispositivo pregunta primero a Pi-hole por el nombre del servicio y después manda la petición a Traefik, que la reenvía al contenedor que corresponde.
 
 ## Índice
 

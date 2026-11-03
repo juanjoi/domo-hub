@@ -1,0 +1,51 @@
+# Proxy inverso. Todo el tráfico web entra por aquí.
+# Cada servicio publicado declara su nombre con etiquetas en su propio stack.
+# Los que aún no están en domo-hub se declaran en dinamico/.
+# Crea la red proxy: los servicios publicados se unen a ella como externa,
+# así que este stack se despliega antes que ellos.
+services:
+  traefik:
+    image: traefik:v3.7.17
+    container_name: traefik
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    command:
+      - --entrypoints.web.address=:80
+      - --providers.docker=true
+      # Solo se publican los contenedores con traefik.enable=true.
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.network=proxy
+      - --providers.file.directory=/etc/traefik/dinamico
+      - --providers.file.watch=true
+      - --api.dashboard=true
+      - --ping=true
+    ports:
+      - "80:80"
+    environment:
+      - TZ=Europe/Madrid
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck", "--ping"]
+      interval: 30s
+      timeout: 5s
+    volumes:
+      # Traefik lee de Docker las etiquetas de los servicios.
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      # Configuración versionada en este repositorio, no datos.
+      - ./dinamico:/etc/traefik/dinamico:ro
+    labels:
+      - traefik.enable=true
+      # Panel de Traefik, de solo lectura.
+      - traefik.http.routers.traefik.rule=HostRegexp(`^traefik\.`)
+      - traefik.http.routers.traefik.service=api@internal
+    networks:
+      - proxy
+      # Red anterior a domo-hub, donde siguen los servicios aún sin migrar.
+      # Se quita cuando ya no quede ninguno en ella.
+      - services
+networks:
+  proxy:
+    name: proxy
+  services:
+    name: services
+    external: true

@@ -28,9 +28,6 @@ http:
     wud:
       rule: HostRegexp(`^wud\.`)
       service: wud
-    zigbee2mqtt:
-      rule: HostRegexp(`^zigbee2mqtt\.`)
-      service: zigbee2mqtt
   services:
     firefly-importer:
       loadBalancer:
@@ -64,7 +61,3 @@ http:
       loadBalancer:
         servers:
           - url: http://wud:3000
-    zigbee2mqtt:
-      loadBalancer:
-        servers:
-          - url: http://zigbee2mqtt:8080

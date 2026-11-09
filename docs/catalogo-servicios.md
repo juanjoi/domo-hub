@@ -9,6 +9,7 @@ Servicios definidos en este repositorio. Cada servicio se añade como una fila m
 | File Browser | Familia | Acceso web a los ficheros compartidos |
 | Jellyfin | Familia | Películas y series |
 | Mosquitto (MQTT) | Domótica | Bus de mensajes entre Zigbee2MQTT y Home Assistant |
+| Zigbee2MQTT | Domótica | Puente entre los dispositivos Zigbee y MQTT |
 
 Categorías: **Infraestructura**, **Familia**, **Domótica**.
 

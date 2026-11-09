@@ -8,10 +8,6 @@ services:
     command: mosquitto -c /mosquitto-no-auth.conf
     networks:
       - mqtt
-      - services
 networks:
   mqtt:
     name: mqtt
-  services:
-    name: services
-    external: true

@@ -18,12 +18,12 @@ Este repositorio es la fuente de verdad: lo que está en `main` es lo que debe c
    - **Mientras no exista el panel**, por SSH:
 
      ```bash
-     cd <clon del repositorio> && git fetch
-     git restore --source=origin/main --worktree -- stacks/<servicio>/
-     docker compose -f stacks/<servicio>/docker-compose.yml up -d
+     cd <clon del repositorio> && sudo git fetch
+     sudo git restore --source=origin/main --worktree -- stacks/<servicio>/
+     sudo docker compose -f stacks/<servicio>/docker-compose.yml up -d
      ```
 
-   No se hace `git pull`: solo se actualiza la carpeta del stack que se despliega, igual que hace el panel. Con `git pull` cambiarían a la vez los ficheros de todos los stacks, y algunos, como las rutas de Traefik, se aplican al momento.
+   Todo con `sudo`: el panel corre como root y parte del clon es suyo. No se hace `git pull`: solo se actualiza la carpeta del stack que se despliega, igual que hace el panel. Con `git pull` cambiarían a la vez los ficheros de todos los stacks, y algunos, como las rutas de Traefik, se aplican al momento.
 
 El panel se publica por Traefik como cualquier servicio, sin login. La primera vez se levanta a mano, y después se actualiza a sí mismo:
 

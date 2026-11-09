@@ -10,9 +10,6 @@ http:
     firefly:
       rule: HostRegexp(`^firefly\.`)
       service: firefly
-    ha:
-      rule: HostRegexp(`^ha\.`)
-      service: ha
     immich:
       rule: HostRegexp(`^immich\.`)
       service: immich
@@ -37,10 +34,6 @@ http:
       loadBalancer:
         servers:
           - url: http://firefly:8080
-    ha:
-      loadBalancer:
-        servers:
-          - url: http://homeassistant:8123
     immich:
       loadBalancer:
         servers:

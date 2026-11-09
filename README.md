@@ -40,3 +40,4 @@ El dispositivo pregunta primero a Pi-hole por el nombre del servicio y después 
 | [Operación](docs/operacion.md) | Cómo se despliega, actualiza y vuelve atrás |
 | [Alta de un servicio](docs/alta-servicio.md) | Pasos para publicar un contenedor nuevo |
 | [Catálogo de servicios](docs/catalogo-servicios.md) | Servicios desplegados |
+| [Home Assistant](docs/homeassistant.md) | Primer arranque y conexión con Zigbee2MQTT |

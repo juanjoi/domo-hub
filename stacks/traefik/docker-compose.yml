@@ -46,6 +46,10 @@ services:
 networks:
   proxy:
     name: proxy
+    # Subred fija: Home Assistant confía en ella como proxy.
+    ipam:
+      config:
+        - subnet: 172.23.0.0/16
   services:
     name: services
     external: true

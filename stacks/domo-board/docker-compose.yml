@@ -4,7 +4,7 @@
 # servidor.
 services:
   domo-board:
-    image: ghcr.io/juanjoi/domo-board:0.1.0
+    image: ghcr.io/juanjoi/domo-board:0.2.0
     container_name: domo-board
     restart: unless-stopped
     environment:

@@ -57,7 +57,7 @@ Todo cambio pasa por Git, salvo los secretos. Lo que se edite a mano en el servi
 Los servicios publicados comparten la red `proxy`, para que Traefik los alcance por nombre de contenedor. El resto se queda en la red propia de su stack, salvo las bases de datos compartidas.
 
 - El stack de Traefik crea la red, con `name: proxy` y una subred fija, y los demás la declaran como externa. Por eso se despliega antes que ellos. Home Assistant confía en esa subred como proxy.
-- Cambiar la definición de `proxy` (subred u opciones) obliga a recrearla, y Compose no puede hacerlo con contenedores conectados: deja Traefik parado y falla. Se hace por SSH, desconectando antes los demás contenedores y volviéndolos a conectar después. Al final se reinicia Traefik: si se reconecta un contenedor, Traefik puede seguir usando su IP anterior y mandar sus peticiones a otro servicio.
+- Cambiar la definición de `proxy` (subred u opciones) obliga a recrearla, y Compose no puede hacerlo con contenedores conectados: deja Traefik parado y falla. Se hace por SSH: se desconectan los demás contenedores, se borra el contenedor de Traefik (no guarda datos) y se despliega su stack, que crea la red de nuevo. Después se reconectan los demás y se reinicia Traefik: si se reconecta un contenedor, Traefik puede seguir usando su IP anterior y mandar sus peticiones a otro servicio.
 - Los servicios detrás del proxy no publican puertos en el servidor.
 - Home Assistant está en `proxy`, como cualquier servicio publicado, y en `mqtt`. Se une a `voice` al montar el asistente de voz.
 - La red `mqtt` la crea el stack de Mosquitto. En ella están Mosquitto, Zigbee2MQTT y Home Assistant.

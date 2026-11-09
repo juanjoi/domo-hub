@@ -58,9 +58,10 @@ Los servicios publicados comparten la red `proxy`, para que Traefik los alcance 
 
 - El stack de Traefik crea la red, con `name: proxy`, y los demás la declaran como externa. Por eso se despliega antes que ellos.
 - Los servicios detrás del proxy no publican puertos en el servidor.
-- Home Assistant está en `proxy`, como cualquier servicio publicado, y en `domotica`.
-- La red `domotica` la crea el stack de Mosquitto (MQTT). En ella están Zigbee2MQTT, Home Assistant y los servicios de voz, que no están en `proxy` porque solo hablan con Home Assistant.
-- Durante la migración, Traefik también está en `services`, la red compartida anterior, para seguir llegando a los servicios que aún no se han migrado. Esos servicios se declaran en `stacks/traefik/dinamico/`. Cada servicio migrado pasa a `proxy` y a sus propias etiquetas.
+- Home Assistant está en `proxy`, como cualquier servicio publicado, y en `mqtt` y `voice`.
+- La red `mqtt` la crea el stack de Mosquitto. En ella están Mosquitto, Zigbee2MQTT y Home Assistant.
+- La red `voice` la crea el stack de los servicios de voz. En ella están esos servicios y Home Assistant, que es el único que habla con ellos; por eso no están en `proxy`.
+- Durante la migración, Traefik también está en `services`, la red compartida anterior, para seguir llegando a los servicios que aún no se han migrado. Esos servicios se declaran en `stacks/traefik/dinamico/`. Cada servicio migrado pasa a `proxy` y a sus propias etiquetas. Mosquitto también sigue en `services` mientras Zigbee2MQTT no se haya migrado.
 
 ## Publicar un servicio
 

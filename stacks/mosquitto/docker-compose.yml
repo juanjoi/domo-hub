@@ -1,0 +1,17 @@
+services:
+  mqtt:
+    image: eclipse-mosquitto:2.0.22
+    container_name: mqtt
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    command: mosquitto -c /mosquitto-no-auth.conf
+    networks:
+      - mqtt
+      - services
+networks:
+  mqtt:
+    name: mqtt
+  services:
+    name: services
+    external: true

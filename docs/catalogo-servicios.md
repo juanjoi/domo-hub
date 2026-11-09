@@ -8,6 +8,7 @@ Servicios definidos en este repositorio. Cada servicio se añade como una fila m
 | domo-board | Infraestructura | Panel para actualizar los stacks con un botón |
 | File Browser | Familia | Acceso web a los ficheros compartidos |
 | Jellyfin | Familia | Películas y series |
+| Mosquitto (MQTT) | Domótica | Bus de mensajes entre Zigbee2MQTT y Home Assistant |
 
 Categorías: **Infraestructura**, **Familia**, **Domótica**.
 

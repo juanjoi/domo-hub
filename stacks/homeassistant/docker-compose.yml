@@ -1,8 +1,39 @@
 services:
+  homeassistant-config:
+    image: busybox:1.37
+    container_name: homeassistant-config
+    command:
+      - sh
+      - -c
+      - |
+        [ -f /config/configuration.yaml ] && exit 0
+        cat > /config/configuration.yaml <<'FIN'
+        default_config:
+
+        frontend:
+          themes: !include_dir_merge_named themes
+
+        automation: !include automations.yaml
+        script: !include scripts.yaml
+        scene: !include scenes.yaml
+
+        http:
+          use_x_forwarded_for: true
+          trusted_proxies:
+            - 172.23.0.0/16
+        FIN
+        echo '[]' > /config/automations.yaml
+        touch /config/scripts.yaml /config/scenes.yaml
+    volumes:
+      - /docker/homeassistant:/config
+    network_mode: none
   homeassistant:
     image: ghcr.io/home-assistant/home-assistant:2026.11.0
     container_name: homeassistant
     restart: unless-stopped
+    depends_on:
+      homeassistant-config:
+        condition: service_completed_successfully
     environment:
       - TZ=Europe/Madrid
     volumes:

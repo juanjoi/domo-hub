@@ -4,21 +4,15 @@ Home Assistant se instala desde cero y recupera los dispositivos Zigbee a travé
 
 ## Primer arranque
 
-Recién instalado, Home Assistant no acepta peticiones a través de un proxy: por Traefik responde con un error 400. La configuración del servidor HTTP, incluido el proxy, se gestiona desde la interfaz y no desde `configuration.yaml`. Por eso la primera vez se entra directamente al contenedor con un túnel SSH:
+Recién instalado, Home Assistant no acepta peticiones a través de un proxy: por Traefik respondería con un error 400. Si la carpeta de datos está vacía, el contenedor `homeassistant-config` crea la configuración inicial antes de arrancar Home Assistant. Es la configuración por defecto más el bloque `http`, que confía en la subred de la red `proxy`, fijada en el stack de Traefik. Si la configuración ya existe, no la toca.
 
-1. **Desplegar el stack** con la carpeta de datos vacía.
-2. **Buscar la IP del contenedor** en la red `proxy`:
+Home Assistant no aplica ese bloque de forma definitiva. Lo pasa una sola vez a sus ajustes como cambio pendiente, y desde entonces se gestiona desde la interfaz:
 
-   ```bash
-   sudo docker inspect homeassistant --format '{{range $n, $c := .NetworkSettings.Networks}}{{$n}} {{$c.IPAddress}}{{println}}{{end}}'
-   ```
+1. **Desplegar el stack** con la carpeta de datos vacía y abrir Home Assistant por su nombre, a través de Traefik.
+2. **Confirmar la configuración del proxy** cuando Home Assistant lo pida, antes de 5 minutos desde que arranca. Si no se confirma a tiempo, vuelve a la configuración sin proxy y responde con un error 400. Como el bloque del YAML ya no se vuelve a leer, entonces hay que empezar de cero: bajar el stack, borrar la carpeta de datos y desplegarlo de nuevo.
+3. **Completar el asistente inicial**: usuario, zona y unidades.
 
-3. **Abrir un túnel** desde el equipo, con `ssh -L 8123:<IP del contenedor>:8123 <servidor>`, y entrar en `http://localhost:8123`.
-4. **Completar el asistente inicial**: usuario, zona y unidades.
-5. **Configurar el proxy** en los ajustes de red de Home Assistant: activar el proxy inverso y confiar en la subred de la red `proxy`, que está fijada en el stack de Traefik. Home Assistant se reinicia y pide confirmar el cambio. Hay que confirmarlo, todavía por el túnel, antes de 5 minutos. Si no, lo descarta.
-6. **Comprobar** que Home Assistant abre por su nombre a través de Traefik.
-
-Si algún día cambia la subred de `proxy`, hay que cambiarla también aquí.
+Si algún día cambia la subred de `proxy`, hay que cambiarla también en los ajustes de red de Home Assistant.
 
 ## Zigbee y MQTT
 

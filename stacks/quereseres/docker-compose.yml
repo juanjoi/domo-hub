@@ -1,0 +1,45 @@
+# Tareas pendientes de casa en tableros kanban. Sin login, como el resto del
+# servidor: se llega desde la red de casa o por Tailscale.
+services:
+  # Quereseres corre con el usuario node (uid 1000): antes de arrancarlo, se
+  # crea su carpeta de datos y se le da si no es suya. Así el stack no necesita
+  # preparar nada a mano en el servidor.
+  quereseres-permisos:
+    image: busybox:1.37
+    container_name: quereseres-permisos
+    command:
+      - sh
+      - -c
+      - |
+        mkdir -p /datos/data
+        [ "$$(stat -c %u:%g /datos/data)" = 1000:1000 ] || chown -R 1000:1000 /datos/data
+    volumes:
+      - /docker/quereseres:/datos
+    network_mode: none
+  quereseres:
+    image: ghcr.io/juanjoi/quereseres:1.1.0
+    container_name: quereseres
+    restart: unless-stopped
+    depends_on:
+      quereseres-permisos:
+        condition: service_completed_successfully
+    environment:
+      - TZ=Europe/Madrid
+      # Días que pasan las tareas en la papelera antes de borrarse solas.
+      - NUXT_TRASH_RETENTION_DAYS=30
+    volumes:
+      # Fichero de datos, su copia anterior y las copias de cada importación.
+      - /docker/quereseres/data:/data
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.quereseres.rule=HostRegexp(`^quereseres\.`)
+      - traefik.http.middlewares.quereseres-menu.plugin.menu.categoria=Familia
+      - traefik.http.middlewares.quereseres-menu.plugin.menu.nombre=Quereseres
+      - traefik.http.middlewares.quereseres-menu.plugin.menu.icono=quereseres.svg
+      - traefik.http.routers.quereseres.middlewares=compress@file,quereseres-menu
+      - traefik.http.services.quereseres.loadbalancer.server.port=3000
+    networks:
+      - proxy
+networks:
+  proxy:
+    external: true

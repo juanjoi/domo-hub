@@ -9,6 +9,7 @@ Servicios definidos en este repositorio. Cada servicio se añade como una fila m
 | domo-menu | Infraestructura | Menú común: botón en el borde de cada aplicación web que abre la lista de aplicaciones |
 | File Browser | Familia | Acceso web a los ficheros compartidos |
 | Jellyfin | Familia | Películas y series |
+| Quereseres | Familia | Tareas pendientes de casa en tableros kanban |
 | Mosquitto (MQTT) | Domótica | Bus de mensajes entre Zigbee2MQTT y Home Assistant |
 | Zigbee2MQTT | Domótica | Puente entre los dispositivos Zigbee y MQTT |
 | Home Assistant | Domótica | Control de la casa ([puesta en marcha](homeassistant.md)) |

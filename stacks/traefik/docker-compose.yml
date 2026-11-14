@@ -7,7 +7,7 @@ services:
   # Copia el plugin del menú común (domo-menu) al volumen de plugins antes de
   # que arranque Traefik. Misma versión que el stack de domo-menu.
   traefik-plugin-menu:
-    image: ghcr.io/juanjoi/domo-menu:0.1.0
+    image: ghcr.io/juanjoi/domo-menu:0.2.0
     container_name: traefik-plugin-menu
     command: ["instalar-plugin", "/plugins-local"]
     volumes:

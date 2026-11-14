@@ -3,9 +3,10 @@
 # lista de esas aplicaciones, que lee de la API de Traefik.
 # El plugin lo instala el stack de Traefik con esta misma imagen: las dos
 # versiones van siempre a la par.
+# Guarda la posición del botón, que es la misma en todas las aplicaciones.
 services:
   domo-menu:
-    image: ghcr.io/juanjoi/domo-menu:0.1.0
+    image: ghcr.io/juanjoi/domo-menu:0.2.0
     container_name: domo-menu
     restart: unless-stopped
     read_only: true
@@ -15,6 +16,9 @@ services:
       - TZ=Europe/Madrid
       # API de Traefik en su entrada interna, que no se publica.
       - MENU_API_TRAEFIK=http://traefik:8080
+    volumes:
+      # Posición del botón, una sola para toda la casa.
+      - /docker/domo-menu:/datos
     labels:
       - traefik.enable=true
       # /__menu/ en cualquier nombre, por encima de las rutas de las

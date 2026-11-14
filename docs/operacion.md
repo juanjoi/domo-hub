@@ -92,6 +92,7 @@ Las aplicaciones con el middleware `menu` muestran en un borde de la pantalla un
 - **Piezas**: el plugin de Traefik, que inserta el menú en las páginas, y el servicio `domo-menu`, que sirve el menú y la lista. El stack de Traefik instala el plugin desde la imagen de `domo-menu` en cada despliegue.
 - **Versiones a la par**: la imagen de `domo-menu` aparece en su stack y en el de Traefik, con la misma versión. Renovate cambia las dos en el mismo PR. Se despliega primero Traefik, que se reinicia para cargar el plugin nuevo, y después `domo-menu`.
 - **Si el plugin falla al cargar**, las rutas que usan `menu` dejan de responder y el resto sigue igual. Para recuperarlas todas a la vez, en `middlewares.yml` se cambia la definición de `menu` por una que no hace nada (`headers: {}`), sin quitar el nombre: si se quita, esas rutas fallan por usar un middleware que no existe. Traefik aplica el cambio al momento.
+- **Posición del botón**: es una sola para toda la casa y la guarda `domo-menu` en `/docker/domo-menu`. Moverla en un dispositivo la mueve en todos.
 - **Sin menú no se rompe nada**: si `domo-menu` está parado o una aplicación bloquea scripts con su política de seguridad, la aplicación funciona igual, solo que sin botón.
 
 ## Bases de datos compartidas

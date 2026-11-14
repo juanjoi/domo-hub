@@ -4,13 +4,15 @@
 # servidor.
 services:
   domo-board:
-    image: ghcr.io/juanjoi/domo-board:0.3.0
+    image: ghcr.io/juanjoi/domo-board:0.4.0
     container_name: domo-board
     restart: unless-stopped
     environment:
       - TZ=Europe/Madrid
       - DOMO_REPO=/docker/domo-hub
       - DOMO_DATOS=/docker/domo-board
+      # Lista de aplicaciones del menú común, por la red interna.
+      - DOMO_MENU=http://domo-menu:8080
     # Solo para entrar por un túnel SSH si Traefik falla.
     ports:
       - "127.0.0.1:8099:8080"

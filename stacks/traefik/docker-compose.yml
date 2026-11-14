@@ -4,12 +4,27 @@
 # Crea la red proxy: los servicios publicados se unen a ella como externa,
 # así que este stack se despliega antes que ellos.
 services:
+  # Copia el plugin del menú común (domo-menu) al volumen de plugins antes de
+  # que arranque Traefik. Misma versión que el stack de domo-menu.
+  traefik-plugin-menu:
+    image: ghcr.io/juanjoi/domo-menu:0.1.0
+    container_name: traefik-plugin-menu
+    command: ["instalar-plugin", "/plugins-local"]
+    volumes:
+      - traefik-plugins:/plugins-local
+    network_mode: none
   traefik:
     image: traefik:v3.7.17
     container_name: traefik
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    depends_on:
+      traefik-plugin-menu:
+        condition: service_completed_successfully
+        # Traefik solo lee los plugins al arrancar: se reinicia cuando cambia
+        # la versión del plugin.
+        restart: true
     command:
       - --entrypoints.web.address=:80
       - --providers.docker=true
@@ -19,7 +34,13 @@ services:
       - --providers.file.directory=/etc/traefik/dinamico
       - --providers.file.watch=true
       - --api.dashboard=true
+      # API también en la entrada interna "traefik", que no se publica: la lee
+      # domo-menu para saber qué aplicaciones llevan el menú.
+      - --api.insecure=true
       - --ping=true
+      # Plugin del menú común. Si no carga, solo fallan las rutas que usan el
+      # middleware "menu"; se recuperan quitándoselo.
+      - --experimental.localplugins.menu.modulename=github.com/juanjoi/domo-menu
     ports:
       - "80:80"
     environment:
@@ -33,16 +54,21 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       # Configuración versionada en este repositorio, no datos.
       - ./dinamico:/etc/traefik/dinamico:ro
+      - traefik-plugins:/plugins-local
     labels:
       - traefik.enable=true
       # Panel de Traefik, de solo lectura.
       - traefik.http.routers.traefik.rule=HostRegexp(`^traefik\.`)
       - traefik.http.routers.traefik.service=api@internal
+      - traefik.http.routers.traefik.middlewares=compress@file,menu@file
     networks:
       - proxy
       # Red anterior a domo-hub, donde siguen los servicios aún sin migrar.
       # Se quita cuando ya no quede ninguno en ella.
       - services
+volumes:
+  # Se rellena en cada despliegue desde la imagen de domo-menu.
+  traefik-plugins:
 networks:
   proxy:
     name: proxy

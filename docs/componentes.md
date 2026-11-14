@@ -8,6 +8,7 @@ La infraestructura se apoya en unas pocas piezas, y cada una tiene una sola resp
 | Tailscale | VPN | Da acceso a la red de casa desde fuera sin abrir puertos en el router |
 | Traefik | Proxy inverso | Recibe todas las peticiones web y las envía al contenedor que toca según el nombre. Cada servicio declara en su stack cómo se publica |
 | Panel de actualización (`domo-board`) | Despliegue | Aplica los cambios de este repositorio en el servidor con un botón por stack |
+| Menú común (`domo-menu`) | Navegación | Pone en cada aplicación web un botón que abre la lista de aplicaciones. Traefik lo inserta en las páginas de los servicios que lo piden en sus etiquetas |
 | Portainer | Interfaz de Docker | Ver el estado, los logs y la consola de los contenedores |
 
 Todo corre sobre **Docker**: cada servicio (familiar, domótico o de infraestructura) tiene su propio contenedor.

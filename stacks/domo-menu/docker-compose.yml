@@ -1,0 +1,33 @@
+# Menú común de las aplicaciones web. Sirve el script que el plugin de Traefik
+# inserta en las páginas de las aplicaciones con el middleware "menu", y la
+# lista de esas aplicaciones, que lee de la API de Traefik.
+# El plugin lo instala el stack de Traefik con esta misma imagen: las dos
+# versiones van siempre a la par.
+services:
+  domo-menu:
+    image: ghcr.io/juanjoi/domo-menu:0.1.0
+    container_name: domo-menu
+    restart: unless-stopped
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - TZ=Europe/Madrid
+      # API de Traefik en su entrada interna, que no se publica.
+      - MENU_API_TRAEFIK=http://traefik:8080
+    labels:
+      - traefik.enable=true
+      # /__menu/ en cualquier nombre, por encima de las rutas de las
+      # aplicaciones, para que el script sea del mismo origen que cada una.
+      - traefik.http.routers.domo-menu.rule=PathPrefix(`/__menu/`)
+      - traefik.http.routers.domo-menu.priority=1000000
+      - traefik.http.routers.domo-menu.middlewares=domo-menu-sin-credenciales
+      # El menú no recibe las cookies ni las credenciales de las aplicaciones.
+      - traefik.http.middlewares.domo-menu-sin-credenciales.headers.customrequestheaders.Cookie=
+      - traefik.http.middlewares.domo-menu-sin-credenciales.headers.customrequestheaders.Authorization=
+      - traefik.http.services.domo-menu.loadbalancer.server.port=8080
+    networks:
+      - proxy
+networks:
+  proxy:
+    external: true

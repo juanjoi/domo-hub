@@ -27,6 +27,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.domo-board.rule=HostRegexp(`^domo-board\.`)
+      - traefik.http.routers.domo-board.middlewares=compress@file,menu@file
       - traefik.http.services.domo-board.loadbalancer.server.port=8080
     networks:
       - proxy

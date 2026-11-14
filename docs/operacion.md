@@ -72,6 +72,7 @@ Cada servicio publicado declara en su `docker-compose.yml` cómo lo publica Trae
     labels:
       - traefik.enable=true
       - traefik.http.routers.<servicio>.rule=HostRegexp(`^<servicio>\.`)
+      - traefik.http.routers.<servicio>.middlewares=compress@file,menu@file
       - traefik.http.services.<servicio>.loadbalancer.server.port=<puerto interno>
     networks:
       - proxy
@@ -82,6 +83,16 @@ Cada servicio publicado declara en su `docker-compose.yml` cómo lo publica Trae
 - **El puerto** es el interno del contenedor, siempre explícito.
 - **Sin elegir entrada:** el servicio queda en todas las de Traefik, así que al activar HTTPS las etiquetas no cambian.
 - **El panel de Traefik**, de solo lectura, se publica igual con el nombre `traefik` y muestra qué servicios ha encontrado.
+- **Middlewares**: `compress` comprime las respuestas y `menu` añade el [menú común](#menú-común). Se ponen en ese orden. Están definidos en `stacks/traefik/dinamico/middlewares.yml`.
+
+## Menú común
+
+Las aplicaciones con el middleware `menu` muestran en un borde de la pantalla un botón que abre la lista de aplicaciones, y aparecen en esa lista. Ponerlo en un servicio es todo lo que hace falta; quitarlo lo saca del menú. No se pone en aplicaciones donde no aporta o donde un script ajeno no es bienvenido, como el gestor de contraseñas.
+
+- **Piezas**: el plugin de Traefik, que inserta el menú en las páginas, y el servicio `domo-menu`, que sirve el menú y la lista. El stack de Traefik instala el plugin desde la imagen de `domo-menu` en cada despliegue.
+- **Versiones a la par**: la imagen de `domo-menu` aparece en su stack y en el de Traefik, con la misma versión. Renovate cambia las dos en el mismo PR. Se despliega primero Traefik, que se reinicia para cargar el plugin nuevo, y después `domo-menu`.
+- **Si el plugin falla al cargar**, las rutas que usan `menu` dejan de responder y el resto sigue igual. Para recuperarlas todas a la vez, en `middlewares.yml` se cambia la definición de `menu` por una que no hace nada (`headers: {}`), sin quitar el nombre: si se quita, esas rutas fallan por usar un middleware que no existe. Traefik aplica el cambio al momento.
+- **Sin menú no se rompe nada**: si `domo-menu` está parado o una aplicación bloquea scripts con su política de seguridad, la aplicación funciona igual, solo que sin botón.
 
 ## Bases de datos compartidas
 

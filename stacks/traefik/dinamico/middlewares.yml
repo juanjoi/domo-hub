@@ -1,0 +1,14 @@
+# Middlewares compartidos. Cada servicio los añade en sus etiquetas, por
+# ejemplo traefik.http.routers.<servicio>.middlewares=compress@file,menu@file.
+http:
+  middlewares:
+    # Comprime las respuestas que la aplicación no comprime.
+    compress:
+      compress: {}
+    # Menú común: inserta en las páginas HTML el botón que abre la lista de
+    # aplicaciones. Va siempre después de compress, para que se comprima la
+    # página ya con el menú. Ponerlo añade la aplicación a la lista; quitarlo
+    # la saca.
+    menu:
+      plugin:
+        menu: {}

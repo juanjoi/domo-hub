@@ -41,3 +41,4 @@ El dispositivo pregunta primero a Pi-hole por el nombre del servicio y después 
 | [Alta de un servicio](docs/alta-servicio.md) | Pasos para publicar un contenedor nuevo |
 | [Catálogo de servicios](docs/catalogo-servicios.md) | Servicios desplegados |
 | [Home Assistant](docs/homeassistant.md) | Primer arranque y conexión con Zigbee2MQTT |
+| [Asistente de voz](docs/asistente-voz.md) | Assist con voz local: puesta en marcha y preguntas propias |

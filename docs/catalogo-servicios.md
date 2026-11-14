@@ -12,6 +12,7 @@ Servicios definidos en este repositorio. Cada servicio se añade como una fila m
 | Mosquitto (MQTT) | Domótica | Bus de mensajes entre Zigbee2MQTT y Home Assistant |
 | Zigbee2MQTT | Domótica | Puente entre los dispositivos Zigbee y MQTT |
 | Home Assistant | Domótica | Control de la casa ([puesta en marcha](homeassistant.md)) |
+| Asistente de voz | Domótica | Whisper (voz a texto) y Piper (texto a voz) para Assist ([puesta en marcha](asistente-voz.md)) |
 
 Categorías: **Infraestructura**, **Familia**, **Domótica**.
 

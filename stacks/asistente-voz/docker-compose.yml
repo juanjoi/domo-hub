@@ -1,0 +1,25 @@
+services:
+  whisper:
+    image: rhasspy/wyoming-whisper:3.5.0
+    container_name: wyoming-whisper
+    restart: unless-stopped
+    command: --model base-int8 --language es
+    volumes:
+      - whisper-modelos:/data
+    networks:
+      - voice
+  piper:
+    image: rhasspy/wyoming-piper:2.5.2
+    container_name: wyoming-piper
+    restart: unless-stopped
+    command: --voice es_ES-davefx-medium
+    volumes:
+      - piper-modelos:/data
+    networks:
+      - voice
+volumes:
+  whisper-modelos:
+  piper-modelos:
+networks:
+  voice:
+    name: voice

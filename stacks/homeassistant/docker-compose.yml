@@ -45,8 +45,11 @@ services:
     networks:
       - proxy
       - mqtt
+      - voice
 networks:
   proxy:
     external: true
   mqtt:
+    external: true
+  voice:
     external: true

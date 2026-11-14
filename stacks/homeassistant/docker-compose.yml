@@ -41,6 +41,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.ha.rule=HostRegexp(`^ha\.`)
+      - traefik.http.routers.ha.middlewares=compress@file,menu@file
       - traefik.http.services.ha.loadbalancer.server.port=8123
     networks:
       - proxy

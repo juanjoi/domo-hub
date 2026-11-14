@@ -2,9 +2,20 @@
 # ejemplo traefik.http.routers.<servicio>.middlewares=compress@file,menu@file.
 http:
   middlewares:
-    # Comprime las respuestas que la aplicación no comprime.
+    # Comprime las respuestas de texto que la aplicación no comprime. Solo
+    # texto: los vídeos, fotos y descargas ya vienen comprimidos o no ganan
+    # nada, y comprimirlos gastaría CPU del servidor.
     compress:
-      compress: {}
+      compress:
+        includedContentTypes:
+          - text/html
+          - text/css
+          - text/plain
+          - text/javascript
+          - application/javascript
+          - application/json
+          - application/manifest+json
+          - image/svg+xml
     # Menú común: inserta en las páginas HTML el botón que abre la lista de
     # aplicaciones. Va siempre después de compress, para que se comprima la
     # página ya con el menú. Ponerlo añade la aplicación a la lista; quitarlo

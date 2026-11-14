@@ -13,6 +13,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.zigbee2mqtt.rule=HostRegexp(`^zigbee2mqtt\.`)
+      - traefik.http.routers.zigbee2mqtt.middlewares=compress@file,menu@file
       - traefik.http.services.zigbee2mqtt.loadbalancer.server.port=8080
     networks:
       - proxy

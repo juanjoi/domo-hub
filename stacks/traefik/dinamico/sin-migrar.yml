@@ -7,24 +7,31 @@ http:
     firefly-importer:
       rule: HostRegexp(`^firefly-importer\.`)
       service: firefly-importer
+      middlewares: [compress, menu]
     firefly:
       rule: HostRegexp(`^firefly\.`)
       service: firefly
+      middlewares: [compress, menu]
     immich:
       rule: HostRegexp(`^immich\.`)
       service: immich
+      middlewares: [compress, menu]
     portainer:
       rule: HostRegexp(`^portainer\.`)
       service: portainer
+      middlewares: [compress, menu]
     recetas:
       rule: HostRegexp(`^recetas\.`)
       service: recetas
+      middlewares: [compress, menu]
+    # Sin menú: en el gestor de contraseñas no se inserta ningún script ajeno.
     vaultwarden:
       rule: HostRegexp(`^vaultwarden\.`)
       service: vaultwarden
     wud:
       rule: HostRegexp(`^wud\.`)
       service: wud
+      middlewares: [compress, menu]
   services:
     firefly-importer:
       loadBalancer:

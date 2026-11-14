@@ -8,37 +8,37 @@ http:
     firefly-importer-menu:
       plugin:
         menu:
-          categoria: Familia
+          categoria: Casa
           nombre: "Importador de Firefly"
           icono: firefly-iii.svg
     firefly-menu:
       plugin:
         menu:
-          categoria: Familia
+          categoria: Casa
           nombre: "Firefly III"
           icono: firefly-iii.svg
     immich-menu:
       plugin:
         menu:
-          categoria: Familia
+          categoria: Media
           nombre: "Immich"
           icono: immich.svg
     portainer-menu:
       plugin:
         menu:
-          categoria: Infraestructura
+          categoria: Administración
           nombre: "Portainer"
           icono: portainer.svg
     recetas-menu:
       plugin:
         menu:
-          categoria: Familia
+          categoria: Casa
           nombre: "Recetas"
           icono: mealie.svg
     wud-menu:
       plugin:
         menu:
-          categoria: Infraestructura
+          categoria: Administración
           nombre: "What's Up Docker"
           icono: whats-up-docker.svg
   routers:

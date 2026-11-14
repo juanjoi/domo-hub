@@ -36,7 +36,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.jellyfin.rule=HostRegexp(`^jellyfin\.`)
-      - traefik.http.middlewares.jellyfin-menu.plugin.menu.categoria=Familia
+      - traefik.http.middlewares.jellyfin-menu.plugin.menu.categoria=Media
       - traefik.http.middlewares.jellyfin-menu.plugin.menu.nombre=Jellyfin
       - traefik.http.middlewares.jellyfin-menu.plugin.menu.icono=jellyfin.svg
       - traefik.http.routers.jellyfin.middlewares=compress@file,jellyfin-menu

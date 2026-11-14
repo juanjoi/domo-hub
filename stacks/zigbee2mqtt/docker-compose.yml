@@ -13,7 +13,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.zigbee2mqtt.rule=HostRegexp(`^zigbee2mqtt\.`)
-      - traefik.http.middlewares.zigbee2mqtt-menu.plugin.menu.categoria=Domótica
+      - traefik.http.middlewares.zigbee2mqtt-menu.plugin.menu.categoria=Administración
       - traefik.http.middlewares.zigbee2mqtt-menu.plugin.menu.nombre=Zigbee2MQTT
       - traefik.http.middlewares.zigbee2mqtt-menu.plugin.menu.icono=zigbee2mqtt.svg
       - traefik.http.routers.zigbee2mqtt.middlewares=compress@file,zigbee2mqtt-menu

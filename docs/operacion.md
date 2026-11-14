@@ -72,7 +72,7 @@ Cada servicio publicado declara en su `docker-compose.yml` cómo lo publica Trae
     labels:
       - traefik.enable=true
       - traefik.http.routers.<servicio>.rule=HostRegexp(`^<servicio>\.`)
-      - traefik.http.middlewares.<servicio>-menu.plugin.menu.categoria=<Infraestructura, Familia o Domótica>
+      - traefik.http.middlewares.<servicio>-menu.plugin.menu.categoria=<Casa, Media o Administración>
       - traefik.http.middlewares.<servicio>-menu.plugin.menu.nombre=<nombre en el menú>
       - traefik.http.middlewares.<servicio>-menu.plugin.menu.icono=<servicio>.svg
       - traefik.http.routers.<servicio>.middlewares=compress@file,<servicio>-menu

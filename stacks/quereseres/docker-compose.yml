@@ -33,7 +33,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.quereseres.rule=HostRegexp(`^quereseres\.`)
-      - traefik.http.middlewares.quereseres-menu.plugin.menu.categoria=Familia
+      - traefik.http.middlewares.quereseres-menu.plugin.menu.categoria=Casa
       - traefik.http.middlewares.quereseres-menu.plugin.menu.nombre=Quereseres
       - traefik.http.middlewares.quereseres-menu.plugin.menu.icono=quereseres.svg
       - traefik.http.routers.quereseres.middlewares=compress@file,quereseres-menu

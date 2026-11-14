@@ -18,7 +18,7 @@ services:
       - MENU_API_TRAEFIK=http://traefik:8080
       # Categorías del menú, en orden. Cada servicio elige la suya con la
       # opción categoria de su middleware del menú.
-      - MENU_CATEGORIAS=Infraestructura,Familia,Domótica
+      - MENU_CATEGORIAS=Casa,Media,Administración
     volumes:
       # Posición del botón, una sola para toda la casa.
       - /docker/domo-menu:/datos

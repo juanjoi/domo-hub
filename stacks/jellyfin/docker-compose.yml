@@ -36,7 +36,10 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.jellyfin.rule=HostRegexp(`^jellyfin\.`)
-      - traefik.http.routers.jellyfin.middlewares=compress@file,menu@file
+      - traefik.http.middlewares.jellyfin-menu.plugin.menu.categoria=Familia
+      - traefik.http.middlewares.jellyfin-menu.plugin.menu.nombre=Jellyfin
+      - traefik.http.middlewares.jellyfin-menu.plugin.menu.icono=jellyfin.svg
+      - traefik.http.routers.jellyfin.middlewares=compress@file,jellyfin-menu
       - traefik.http.services.jellyfin.loadbalancer.server.port=8096
     networks:
       - proxy

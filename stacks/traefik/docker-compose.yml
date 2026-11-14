@@ -7,7 +7,7 @@ services:
   # Copia el plugin del menú común (domo-menu) al volumen de plugins antes de
   # que arranque Traefik. Misma versión que el stack de domo-menu.
   traefik-plugin-menu:
-    image: ghcr.io/juanjoi/domo-menu:0.2.0
+    image: ghcr.io/juanjoi/domo-menu:0.3.1
     container_name: traefik-plugin-menu
     command: ["instalar-plugin", "/plugins-local"]
     volumes:
@@ -60,7 +60,10 @@ services:
       # Panel de Traefik, de solo lectura.
       - traefik.http.routers.traefik.rule=HostRegexp(`^traefik\.`)
       - traefik.http.routers.traefik.service=api@internal
-      - traefik.http.routers.traefik.middlewares=compress@file,menu@file
+      - traefik.http.middlewares.traefik-menu.plugin.menu.categoria=Infraestructura
+      - traefik.http.middlewares.traefik-menu.plugin.menu.nombre=Traefik
+      - traefik.http.middlewares.traefik-menu.plugin.menu.icono=traefik.svg
+      - traefik.http.routers.traefik.middlewares=compress@file,traefik-menu
     networks:
       - proxy
       # Red anterior a domo-hub, donde siguen los servicios aún sin migrar.

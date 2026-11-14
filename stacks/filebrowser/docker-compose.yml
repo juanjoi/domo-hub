@@ -37,7 +37,10 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.filebrowser.rule=HostRegexp(`^filebrowser\.`)
-      - traefik.http.routers.filebrowser.middlewares=compress@file,menu@file
+      - traefik.http.middlewares.filebrowser-menu.plugin.menu.categoria=Familia
+      - traefik.http.middlewares.filebrowser-menu.plugin.menu.nombre=File Browser
+      - traefik.http.middlewares.filebrowser-menu.plugin.menu.icono=filebrowser.svg
+      - traefik.http.routers.filebrowser.middlewares=compress@file,filebrowser-menu
       - traefik.http.services.filebrowser.loadbalancer.server.port=80
     networks:
       - proxy

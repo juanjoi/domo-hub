@@ -72,7 +72,10 @@ Cada servicio publicado declara en su `docker-compose.yml` cómo lo publica Trae
     labels:
       - traefik.enable=true
       - traefik.http.routers.<servicio>.rule=HostRegexp(`^<servicio>\.`)
-      - traefik.http.routers.<servicio>.middlewares=compress@file,menu@file
+      - traefik.http.middlewares.<servicio>-menu.plugin.menu.categoria=<Infraestructura, Familia o Domótica>
+      - traefik.http.middlewares.<servicio>-menu.plugin.menu.nombre=<nombre en el menú>
+      - traefik.http.middlewares.<servicio>-menu.plugin.menu.icono=<servicio>.svg
+      - traefik.http.routers.<servicio>.middlewares=compress@file,<servicio>-menu
       - traefik.http.services.<servicio>.loadbalancer.server.port=<puerto interno>
     networks:
       - proxy
@@ -88,6 +91,9 @@ Cada servicio publicado declara en su `docker-compose.yml` cómo lo publica Trae
 ## Menú común
 
 Las aplicaciones con el middleware `menu` muestran en un borde de la pantalla un botón que abre la lista de aplicaciones, y aparecen en esa lista. Ponerlo en un servicio es todo lo que hace falta; quitarlo lo saca del menú. Lo llevan todos los servicios publicados salvo Vaultwarden: en el gestor de contraseñas no se inserta ningún script ajeno.
+
+- **Categoría, nombre e icono**: cada servicio tiene su propia instancia del middleware del menú (`<servicio>-menu`) con esas tres opciones, como en el ejemplo de [publicar un servicio](#publicar-un-servicio). Las rutas sin migrar las declaran en `dinamico/sin-migrar.yml`. Las categorías posibles, y su orden, están en el stack de `domo-menu`; un servicio sin categoría sale al final, en «Otras».
+- **Iconos**: en `stacks/domo-menu/iconos/`, descargados de un catálogo libre (ver su `LEEME.md`). Un icono nuevo llega al desplegar el stack de `domo-menu`.
 
 - **Piezas**: el plugin de Traefik, que inserta el menú en las páginas, y el servicio `domo-menu`, que sirve el menú y la lista. El stack de Traefik instala el plugin desde la imagen de `domo-menu` en cada despliegue.
 - **Versiones a la par**: la imagen de `domo-menu` aparece en su stack y en el de Traefik, con la misma versión. Renovate cambia las dos en el mismo PR. Se despliega primero Traefik, que se reinicia para cargar el plugin nuevo, y después `domo-menu`.

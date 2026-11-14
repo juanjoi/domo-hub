@@ -41,7 +41,10 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.ha.rule=HostRegexp(`^ha\.`)
-      - traefik.http.routers.ha.middlewares=compress@file,menu@file
+      - traefik.http.middlewares.ha-menu.plugin.menu.categoria=Domótica
+      - traefik.http.middlewares.ha-menu.plugin.menu.nombre=Home Assistant
+      - traefik.http.middlewares.ha-menu.plugin.menu.icono=home-assistant.svg
+      - traefik.http.routers.ha.middlewares=compress@file,ha-menu
       - traefik.http.services.ha.loadbalancer.server.port=8123
     networks:
       - proxy

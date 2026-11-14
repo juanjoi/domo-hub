@@ -6,7 +6,7 @@
 # Guarda la posición del botón, que es la misma en todas las aplicaciones.
 services:
   domo-menu:
-    image: ghcr.io/juanjoi/domo-menu:0.2.0
+    image: ghcr.io/juanjoi/domo-menu:0.3.1
     container_name: domo-menu
     restart: unless-stopped
     read_only: true
@@ -16,9 +16,14 @@ services:
       - TZ=Europe/Madrid
       # API de Traefik en su entrada interna, que no se publica.
       - MENU_API_TRAEFIK=http://traefik:8080
+      # Categorías del menú, en orden. Cada servicio elige la suya con la
+      # opción categoria de su middleware del menú.
+      - MENU_CATEGORIAS=Infraestructura,Familia,Domótica
     volumes:
       # Posición del botón, una sola para toda la casa.
       - /docker/domo-menu:/datos
+      # Iconos de las aplicaciones, versionados junto a este compose.
+      - ./iconos:/iconos:ro
     labels:
       - traefik.enable=true
       # /__menu/ en cualquier nombre, por encima de las rutas de las

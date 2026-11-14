@@ -3,27 +3,65 @@
 # si los dos existen a la vez, Traefik tiene dos rutas para el mismo nombre.
 # Las reglas solo miran el principio del nombre, así el dominio no está en Git.
 http:
+  middlewares:
+    # Menú común de cada ruta: categoría, nombre e icono (ver stacks/domo-menu).
+    firefly-importer-menu:
+      plugin:
+        menu:
+          categoria: Familia
+          nombre: "Importador de Firefly"
+          icono: firefly-iii.svg
+    firefly-menu:
+      plugin:
+        menu:
+          categoria: Familia
+          nombre: "Firefly III"
+          icono: firefly-iii.svg
+    immich-menu:
+      plugin:
+        menu:
+          categoria: Familia
+          nombre: "Immich"
+          icono: immich.svg
+    portainer-menu:
+      plugin:
+        menu:
+          categoria: Infraestructura
+          nombre: "Portainer"
+          icono: portainer.svg
+    recetas-menu:
+      plugin:
+        menu:
+          categoria: Familia
+          nombre: "Recetas"
+          icono: mealie.svg
+    wud-menu:
+      plugin:
+        menu:
+          categoria: Infraestructura
+          nombre: "What's Up Docker"
+          icono: whats-up-docker.svg
   routers:
     firefly-importer:
       rule: HostRegexp(`^firefly-importer\.`)
       service: firefly-importer
-      middlewares: [compress, menu]
+      middlewares: [compress, firefly-importer-menu]
     firefly:
       rule: HostRegexp(`^firefly\.`)
       service: firefly
-      middlewares: [compress, menu]
+      middlewares: [compress, firefly-menu]
     immich:
       rule: HostRegexp(`^immich\.`)
       service: immich
-      middlewares: [compress, menu]
+      middlewares: [compress, immich-menu]
     portainer:
       rule: HostRegexp(`^portainer\.`)
       service: portainer
-      middlewares: [compress, menu]
+      middlewares: [compress, portainer-menu]
     recetas:
       rule: HostRegexp(`^recetas\.`)
       service: recetas
-      middlewares: [compress, menu]
+      middlewares: [compress, recetas-menu]
     # Sin menú: en el gestor de contraseñas no se inserta ningún script ajeno.
     vaultwarden:
       rule: HostRegexp(`^vaultwarden\.`)
@@ -31,7 +69,7 @@ http:
     wud:
       rule: HostRegexp(`^wud\.`)
       service: wud
-      middlewares: [compress, menu]
+      middlewares: [compress, wud-menu]
   services:
     firefly-importer:
       loadBalancer:

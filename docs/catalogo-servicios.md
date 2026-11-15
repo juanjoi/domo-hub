@@ -10,11 +10,11 @@ Servicios definidos en este repositorio. Cada servicio se añade como una fila m
 | File Browser | Media | Acceso web a los ficheros compartidos |
 | Traefik | Administración | Proxy inverso: recibe las peticiones web y las reparte según el nombre |
 | domo-board | Administración | Panel para actualizar los stacks con un botón |
-| domo-menu | Administración | Menú común: botón en el borde de cada aplicación web que abre la lista de aplicaciones |
+| domo-menu | Infraestructura | Menú común: botón en el borde de cada aplicación web que abre la lista de aplicaciones |
 | Zigbee2MQTT | Administración | Puente entre los dispositivos Zigbee y MQTT |
-| Mosquitto (MQTT) | Administración | Bus de mensajes entre Zigbee2MQTT y Home Assistant |
-| Asistente de voz | Administración | Whisper (voz a texto) y Piper (texto a voz) para Assist ([puesta en marcha](asistente-voz.md)) |
+| Mosquitto (MQTT) | Infraestructura | Bus de mensajes entre Zigbee2MQTT y Home Assistant |
+| Asistente de voz | Infraestructura | Whisper (voz a texto) y Piper (texto a voz) para Assist ([puesta en marcha](asistente-voz.md)) |
 
-Categorías: **Casa**, **Media**, **Administración**.
+Categorías: **Casa**, **Media**, **Administración**, **Infraestructura**. Administración es lo que se gestiona a mano, como el proxy, el panel o Zigbee2MQTT; Infraestructura, los servicios de fondo de los que dependen los demás.
 
 [← Volver al índice](../README.md)

@@ -72,7 +72,7 @@ Cada servicio publicado declara en su `docker-compose.yml` cómo lo publica Trae
     labels:
       - traefik.enable=true
       - traefik.http.routers.<servicio>.rule=HostRegexp(`^<servicio>\.`)
-      - traefik.http.middlewares.<servicio>-menu.plugin.menu.categoria=<Casa, Media o Administración>
+      - traefik.http.middlewares.<servicio>-menu.plugin.menu.categoria=<Casa, Media, Administración o Infraestructura>
       - traefik.http.middlewares.<servicio>-menu.plugin.menu.nombre=<nombre en el menú>
       - traefik.http.middlewares.<servicio>-menu.plugin.menu.icono=<servicio>.svg
       - traefik.http.routers.<servicio>.middlewares=compress@file,<servicio>-menu
@@ -86,6 +86,7 @@ Cada servicio publicado declara en su `docker-compose.yml` cómo lo publica Trae
 - **El puerto** es el interno del contenedor, siempre explícito.
 - **Sin elegir entrada:** el servicio queda en todas las de Traefik, así que al activar HTTPS las etiquetas no cambian.
 - **El panel de Traefik**, de solo lectura, se publica igual con el nombre `traefik` y muestra qué servicios ha encontrado.
+- **Stacks sin web**, como Mosquitto: no llevan menú, pero se pueden poner en una categoría de `domo-board` con la etiqueta `domo-board.categoria=<categoría>` en cualquiera de sus servicios.
 - **Middlewares**: `compress` comprime las respuestas de texto (no vídeos, fotos ni descargas) y `menu` añade el [menú común](#menú-común). Se ponen en ese orden. Están definidos en `stacks/traefik/dinamico/middlewares.yml`.
 
 ## Menú común

@@ -4,6 +4,9 @@ services:
     container_name: wyoming-whisper
     restart: unless-stopped
     command: --model base-int8 --language es
+    labels:
+      # Sin web: en domo-board va en esta categoría.
+      - domo-board.categoria=Infraestructura
     volumes:
       - whisper-modelos:/data
     networks:

@@ -6,7 +6,7 @@
 # Guarda la posición del botón, que es la misma en todas las aplicaciones.
 services:
   domo-menu:
-    image: ghcr.io/juanjoi/domo-menu:0.4.2
+    image: ghcr.io/juanjoi/domo-menu:0.4.3
     container_name: domo-menu
     restart: unless-stopped
     read_only: true

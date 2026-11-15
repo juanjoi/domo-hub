@@ -30,6 +30,7 @@ services:
       - traefik.enable=true
       - traefik.http.routers.domo-board.rule=HostRegexp(`^domo-board\.`)
       - traefik.http.middlewares.domo-board-menu.plugin.menu.categoria=Administración
+      - traefik.http.middlewares.domo-board-menu.plugin.menu.icono=domo-board.svg
       - traefik.http.routers.domo-board.middlewares=compress@file,domo-board-menu
       - traefik.http.services.domo-board.loadbalancer.server.port=8080
     networks:

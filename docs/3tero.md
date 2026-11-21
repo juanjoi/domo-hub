@@ -2,13 +2,12 @@
 
 Proyectos de impresión 3D de la familia: modelos, fotos, materiales, coste e importación desde MakerWorld. La imagen se publica desde su propio repositorio al etiquetar cada versión.
 
-Necesita PostgreSQL. Mientras no esté desplegado el [PostgreSQL compartido](postgres.md), el stack trae su propia base de datos, `3tero-db`, en una red interna solo para la aplicación. Cuando esté el compartido, se pasa la base a él y se quita `3tero-db`.
+Necesita PostgreSQL. Mientras no esté desplegado el [PostgreSQL compartido](postgres.md), el stack trae su propia base de datos, `3tero-db`, en una red interna solo para la aplicación. No tiene contraseña: no publica puertos, no tiene salida a internet y solo la aplicación llega a ella. Cuando esté el compartido, se pasa la base a él y se quita `3tero-db`.
 
 ## Primer despliegue
 
-1. En el servidor, crear `stacks/3tero/.env` a partir de `.env.example`, con una contraseña larga solo de letras y números, porque va dentro de la URL de conexión. Guardarla también en el gestor de contraseñas.
-2. Desplegar el stack. La primera vez crea la base en `/docker/3tero/postgres` y la carpeta de ficheros en `/docker/3tero/data`. La aplicación espera a que la base esté lista y crea sus tablas sola.
-3. Abrir 3tero por su nombre y comprobar que carga.
+1. Desplegar el stack. No necesita `.env`. La primera vez crea la base en `/docker/3tero/postgres` y la carpeta de ficheros en `/docker/3tero/data`. La aplicación espera a que la base esté lista y crea sus tablas sola.
+2. Abrir 3tero por su nombre y comprobar que carga.
 
 ## Copias
 
@@ -38,8 +37,7 @@ Con el compartido ya desplegado:
 5. Cambiar el stack en este repositorio:
    - Quitar el servicio `3tero-db` y la red `interna`.
    - Unir la aplicación a la red `db`, declarada como externa, en lugar de `interna`.
-   - En `NUXT_DATABASE_URL`, cambiar el servidor `3tero-db` por `postgres`.
-   - En el `.env`, poner la contraseña del usuario creado en el compartido.
+   - En `NUXT_DATABASE_URL`, cambiar el servidor `3tero-db` por `postgres` y añadir la contraseña del usuario creado en el compartido, tomada de un `.env` (con un `.env.example` versionado, como en los demás stacks).
 6. Desplegar el stack y comprobar que los proyectos siguen ahí.
 7. Pasados unos días con todo funcionando, borrar `/docker/3tero/postgres`.
 

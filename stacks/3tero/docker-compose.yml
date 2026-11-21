@@ -2,8 +2,10 @@
 # servidor: se llega desde la red de casa o por Tailscale.
 #
 # Base de datos temporal: mientras no esté desplegado el PostgreSQL compartido,
-# el stack trae su propio PostgreSQL, en una red solo para él. Después se pasa la
-# base al compartido y se quita 3tero-db (ver docs/3tero.md).
+# el stack trae su propio PostgreSQL, en una red interna solo para él y la
+# aplicación. Sin contraseña: nadie más llega a esa red, no publica puertos y no
+# tiene salida a internet. Después se pasa la base al compartido, con su usuario
+# y contraseña, y se quita 3tero-db (ver docs/3tero.md).
 services:
   # 3tero corre con el usuario node (uid 1000): antes de arrancarlo, se crea su
   # carpeta de ficheros y se le da si no es suya.
@@ -31,7 +33,7 @@ services:
       - TZ=Europe/Madrid
       - POSTGRES_USER=trestero
       - POSTGRES_DB=trestero
-      - POSTGRES_PASSWORD=${TRESTERO_DB_PASSWORD:?falta TRESTERO_DB_PASSWORD en el .env}
+      - POSTGRES_HOST_AUTH_METHOD=trust
       - POSTGRES_INITDB_ARGS=--data-checksums
     volumes:
       - /docker/3tero/postgres:/var/lib/postgresql/data
@@ -56,7 +58,7 @@ services:
         condition: service_healthy
     environment:
       - TZ=Europe/Madrid
-      - NUXT_DATABASE_URL=postgres://trestero:${TRESTERO_DB_PASSWORD}@3tero-db:5432/trestero
+      - NUXT_DATABASE_URL=postgres://trestero@3tero-db:5432/trestero
       # Impresora de casa, como la nombra MakerWorld: al importar se preseleccionan
       # los perfiles laminados para ella.
       - NUXT_PUBLIC_PRINTER_MODEL=A1 mini
@@ -78,3 +80,4 @@ networks:
   proxy:
     external: true
   interna:
+    internal: true

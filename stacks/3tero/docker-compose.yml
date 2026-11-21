@@ -1,0 +1,80 @@
+# Proyectos de impresión 3D de la familia. Sin login, como el resto del
+# servidor: se llega desde la red de casa o por Tailscale.
+#
+# Base de datos temporal: mientras no esté desplegado el PostgreSQL compartido,
+# el stack trae su propio PostgreSQL, en una red solo para él. Después se pasa la
+# base al compartido y se quita 3tero-db (ver docs/3tero.md).
+services:
+  # 3tero corre con el usuario node (uid 1000): antes de arrancarlo, se crea su
+  # carpeta de ficheros y se le da si no es suya.
+  3tero-permisos:
+    image: busybox:1.37
+    container_name: 3tero-permisos
+    command:
+      - sh
+      - -c
+      - |
+        mkdir -p /datos/data
+        [ "$$(stat -c %u:%g /datos/data)" = 1000:1000 ] || chown -R 1000:1000 /datos/data
+    volumes:
+      - /docker/3tero:/datos
+    network_mode: none
+  3tero-db:
+    # Misma versión mayor que el PostgreSQL compartido, para pasar la base sin
+    # cambiar de versión.
+    image: postgres:17.6-alpine
+    container_name: 3tero-db
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - TZ=Europe/Madrid
+      - POSTGRES_USER=trestero
+      - POSTGRES_DB=trestero
+      - POSTGRES_PASSWORD=${TRESTERO_DB_PASSWORD:?falta TRESTERO_DB_PASSWORD en el .env}
+      - POSTGRES_INITDB_ARGS=--data-checksums
+    volumes:
+      - /docker/3tero/postgres:/var/lib/postgresql/data
+    healthcheck:
+      # Por TCP: en el primer arranque, el servidor temporal que crea la base solo
+      # escucha por socket, y la aplicación no debe conectarse hasta que acabe.
+      test: ["CMD", "pg_isready", "-h", "127.0.0.1", "-U", "trestero", "-d", "trestero"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - interna
+  3tero:
+    image: ghcr.io/juanjoi/3tero:1.0.0
+    container_name: 3tero
+    restart: unless-stopped
+    depends_on:
+      3tero-permisos:
+        condition: service_completed_successfully
+      3tero-db:
+        condition: service_healthy
+    environment:
+      - TZ=Europe/Madrid
+      - NUXT_DATABASE_URL=postgres://trestero:${TRESTERO_DB_PASSWORD}@3tero-db:5432/trestero
+      # Impresora de casa, como la nombra MakerWorld: al importar se preseleccionan
+      # los perfiles laminados para ella.
+      - NUXT_PUBLIC_PRINTER_MODEL=A1 mini
+    volumes:
+      # Imágenes, modelos y miniaturas de los proyectos.
+      - /docker/3tero/data:/data
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.3tero.rule=HostRegexp(`^3tero\.`)
+      - traefik.http.middlewares.3tero-menu.plugin.menu.categoria=Casa
+      - traefik.http.middlewares.3tero-menu.plugin.menu.nombre=3tero
+      - traefik.http.middlewares.3tero-menu.plugin.menu.icono=3tero.svg
+      - traefik.http.routers.3tero.middlewares=compress@file,3tero-menu
+      - traefik.http.services.3tero.loadbalancer.server.port=3000
+    networks:
+      - proxy
+      - interna
+networks:
+  proxy:
+    external: true
+  interna:

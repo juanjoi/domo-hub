@@ -6,6 +6,7 @@ Servicios definidos en este repositorio. Cada servicio se añade como una fila m
 | --- | --- | --- |
 | Home Assistant | Casa | Control de la casa ([puesta en marcha](homeassistant.md)) |
 | Quereseres | Casa | Tareas pendientes de casa en tableros kanban |
+| 3tero | Casa | Proyectos de impresión 3D: modelos, fotos, materiales, coste e importación desde MakerWorld ([puesta en marcha](3tero.md)) |
 | Jellyfin | Media | Películas y series |
 | File Browser | Media | Acceso web a los ficheros compartidos |
 | Traefik | Administración | Proxy inverso: recibe las peticiones web y las reparte según el nombre |

@@ -5,8 +5,8 @@
 # para ella: 3tero-db-alta genera la contraseña de la aplicación y le da de alta
 # su usuario y su base (ver docs/postgres.md).
 services:
-  # 3tero corre con el usuario node (uid 1000): antes de arrancarlo, se crea su
-  # carpeta de ficheros y se le da si no es suya.
+  # 3tero corre con el usuario node (uid 1000) y el traductor con el suyo (uid
+  # 1032): antes de arrancarlos, se crean sus carpetas y se les dan si no son suyas.
   3tero-permisos:
     image: busybox:1.37
     container_name: 3tero-permisos
@@ -14,8 +14,9 @@ services:
       - sh
       - -c
       - |
-        mkdir -p /datos/data
+        mkdir -p /datos/data /datos/traductor
         [ "$$(stat -c %u:%g /datos/data)" = 1000:1000 ] || chown -R 1000:1000 /datos/data
+        [ "$$(stat -c %u /datos/traductor)" = 1032 ] || chown -R 1032 /datos/traductor
     volumes:
       - /docker/3tero:/datos
     network_mode: none
@@ -56,8 +57,40 @@ services:
       - /docker/3tero/claves:/claves
     networks:
       - db
+  # Traductor para el botón «Traducir al español» al importar (LibreTranslate).
+  # Sin cuentas ni claves: los textos no salen de casa. Solo lo usa 3tero, por su
+  # red interna; no se publica por Traefik.
+  3tero-traductor:
+    image: libretranslate/libretranslate:v1.9.6
+    container_name: 3tero-traductor
+    restart: unless-stopped
+    depends_on:
+      3tero-permisos:
+        condition: service_completed_successfully
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - TZ=Europe/Madrid
+      # Solo los idiomas que suelen aparecer en MakerWorld, para ocupar menos
+      # disco y memoria. Inglés y español son imprescindibles: traduce pasando
+      # por el inglés.
+      - LT_LOAD_ONLY=en,es,de,fr,it,zh
+    volumes:
+      # Modelos de idiomas, descargados en el primer arranque.
+      - /docker/3tero/traductor:/home/libretranslate/.local
+    healthcheck:
+      test: ["CMD-SHELL", "./venv/bin/python scripts/healthcheck.py"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      # La primera vez descarga los modelos antes de responder.
+      start_period: 10m
+    networks:
+      - traductor
+      # Salida a internet solo para descargar los modelos.
+      - salida
   3tero:
-    image: ghcr.io/juanjoi/3tero:1.2.0
+    image: ghcr.io/juanjoi/3tero:1.3.0
     container_name: 3tero
     restart: unless-stopped
     depends_on:
@@ -78,6 +111,9 @@ services:
       # Impresora de casa, como la nombra MakerWorld: al importar se preseleccionan
       # los perfiles laminados para ella.
       - NUXT_PUBLIC_PRINTER_MODEL=A1 mini
+      # Traductor del stack. Si no está o no responde, la aplicación funciona igual
+      # y el botón de traducir da un aviso.
+      - NUXT_TRANSLATE_URL=http://3tero-traductor:5000
     volumes:
       # Imágenes, modelos y miniaturas de los proyectos.
       - /docker/3tero/data:/data
@@ -93,8 +129,13 @@ services:
     networks:
       - proxy
       - db
+      - traductor
 networks:
   proxy:
     external: true
   db:
     external: true
+  # Solo 3tero y su traductor, sin salida a internet.
+  traductor:
+    internal: true
+  salida:

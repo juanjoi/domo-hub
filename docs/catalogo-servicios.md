@@ -5,6 +5,7 @@ Servicios definidos en este repositorio. Cada servicio se añade como una fila m
 | Servicio | Categoría | Propósito |
 | --- | --- | --- |
 | Home Assistant | Casa | Control de la casa ([puesta en marcha](homeassistant.md)) |
+| Mealie | Casa | Recetas, menú semanal y lista de la compra; se publica como «recetas» ([puesta en marcha](mealie.md)) |
 | Quereseres | Casa | Tareas pendientes de casa en tableros kanban |
 | 3tero | Casa | Proyectos de impresión 3D: modelos, fotos, materiales, coste e importación desde MakerWorld ([puesta en marcha](3tero.md)) |
 | Jellyfin | Media | Películas y series |

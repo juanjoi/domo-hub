@@ -43,5 +43,6 @@ El dispositivo pregunta primero a Pi-hole por el nombre del servicio y después 
 | [Home Assistant](docs/homeassistant.md) | Primer arranque y conexión con Zigbee2MQTT |
 | [Asistente de voz](docs/asistente-voz.md) | Assist con voz local: puesta en marcha y preguntas propias |
 | [3tero](docs/3tero.md) | Primer despliegue sobre el PostgreSQL compartido |
+| [Mealie](docs/mealie.md) | Paso desde el stack anterior, de SQLite al PostgreSQL compartido |
 | [PostgreSQL compartido](docs/postgres.md) | Primer despliegue, alta automática de una aplicación y cómo traer su base |
 | [Traductor](docs/traductor.md) | Traductor compartido: primer despliegue y cómo usarlo desde una aplicación |

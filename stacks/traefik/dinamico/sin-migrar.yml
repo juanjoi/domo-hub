@@ -29,12 +29,6 @@ http:
           categoria: Administración
           nombre: "Portainer"
           icono: portainer.svg
-    recetas-menu:
-      plugin:
-        menu:
-          categoria: Casa
-          nombre: "Recetas"
-          icono: mealie.svg
     wud-menu:
       plugin:
         menu:
@@ -58,10 +52,6 @@ http:
       rule: HostRegexp(`^portainer\.`)
       service: portainer
       middlewares: [compress, portainer-menu]
-    recetas:
-      rule: HostRegexp(`^recetas\.`)
-      service: recetas
-      middlewares: [compress, recetas-menu]
     # Sin menú: en el gestor de contraseñas no se inserta ningún script ajeno.
     vaultwarden:
       rule: HostRegexp(`^vaultwarden\.`)
@@ -87,10 +77,6 @@ http:
       loadBalancer:
         servers:
           - url: http://portainer:9000
-    recetas:
-      loadBalancer:
-        servers:
-          - url: http://mealie:9000
     vaultwarden:
       loadBalancer:
         servers:

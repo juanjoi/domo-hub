@@ -1,0 +1,89 @@
+# Recetas, menú semanal y lista de la compra. Se publica como «recetas».
+#
+# Base de datos en el PostgreSQL compartido, que se despliega antes. Sin .env:
+# mealie-db-alta genera la contraseña de la aplicación y le da de alta su
+# usuario y su base (ver docs/postgres.md).
+services:
+  # Alta en el PostgreSQL compartido: la primera vez genera la contraseña de la
+  # aplicación; en cada despliegue crea el usuario y la base si no existen.
+  mealie-db-alta:
+    # Misma imagen que el compartido, ya descargada, por psql.
+    image: ghcr.io/immich-app/postgres:18-vectorchord1.1.1-pgvector0.8.7
+    container_name: mealie-db-alta
+    entrypoint:
+      - sh
+      - -c
+      - |
+        set -e
+        if [ ! -s /claves-postgres/postgres ]; then
+          echo "Falta el PostgreSQL compartido: hay que desplegar antes su stack" >&2
+          exit 1
+        fi
+        if [ ! -s /claves/postgres ]; then
+          head -c 24 /dev/urandom | od -An -tx1 | tr -d ' \n' > /claves/postgres.nueva
+          mv /claves/postgres.nueva /claves/postgres
+        fi
+        chown -R 1000:1000 /claves
+        chmod 700 /claves
+        chmod 400 /claves/postgres
+        export PGHOST=postgres PGUSER=postgres PGPASSWORD="$$(cat /claves-postgres/postgres)"
+        for i in $$(seq 30); do pg_isready -q && break; sleep 2; done
+        psql -q -v ON_ERROR_STOP=1 -v usuario=mealie -v clave="$$(cat /claves/postgres)" <<'SQL'
+        SELECT format('CREATE ROLE %I LOGIN', :'usuario')
+          WHERE NOT EXISTS (SELECT FROM pg_roles WHERE rolname = :'usuario') \gexec
+        ALTER ROLE :"usuario" PASSWORD :'clave';
+        SELECT format('CREATE DATABASE %I OWNER %I', :'usuario', :'usuario')
+          WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = :'usuario') \gexec
+        REVOKE ALL ON DATABASE :"usuario" FROM PUBLIC;
+        SQL
+    volumes:
+      - /docker/postgres/claves:/claves-postgres:ro
+      - /docker/mealie/claves:/claves
+    networks:
+      - db
+  mealie:
+    image: ghcr.io/mealie-recipes/mealie:v3.9.2
+    container_name: mealie
+    restart: unless-stopped
+    depends_on:
+      mealie-db-alta:
+        condition: service_completed_successfully
+    environment:
+      - TZ=Europe/Madrid
+      # Usuario con el que corre: la imagen arranca como root, da sus carpetas a
+      # este usuario y cambia a él.
+      - PUID=1000
+      - PGID=1000
+      # Un solo proceso: basta para una casa y gasta menos memoria.
+      - WEB_CONCURRENCY=1
+      - MAX_WORKERS=1
+      - ALLOW_SIGNUP=true
+      # Solo admite «postgres» o «sqlite»: con cualquier otro valor usa SQLite sin
+      # avisar.
+      - DB_ENGINE=postgres
+      - POSTGRES_SERVER=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=mealie
+      - POSTGRES_USER=mealie
+      # Mealie lee la contraseña del fichero que deja mealie-db-alta.
+      - POSTGRES_PASSWORD_FILE=/claves/postgres
+    volumes:
+      # Imágenes de las recetas, copias de seguridad propias y su clave interna.
+      - /docker/mealie/data:/app/data
+      - /docker/mealie/claves:/claves:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.recetas.rule=HostRegexp(`^recetas\.`)
+      - traefik.http.middlewares.recetas-menu.plugin.menu.categoria=Casa
+      - traefik.http.middlewares.recetas-menu.plugin.menu.nombre=Recetas
+      - traefik.http.middlewares.recetas-menu.plugin.menu.icono=mealie.svg
+      - traefik.http.routers.recetas.middlewares=compress@file,recetas-menu
+      - traefik.http.services.recetas.loadbalancer.server.port=9000
+    networks:
+      - proxy
+      - db
+networks:
+  proxy:
+    external: true
+  db:
+    external: true

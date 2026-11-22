@@ -3,6 +3,18 @@
 # Base de datos en el PostgreSQL compartido, que se despliega antes. Sin .env:
 # mealie-db-alta genera la contraseña de la aplicación y le da de alta su
 # usuario y su base (ver docs/postgres.md).
+
+# Conexión a la base, la misma para mealie y mealie-traspaso.
+x-base: &base
+  DB_ENGINE: postgres # Solo admite «postgres» o «sqlite»: con otro valor usa SQLite sin avisar.
+  POSTGRES_SERVER: postgres
+  POSTGRES_PORT: "5432"
+  POSTGRES_DB: mealie
+  POSTGRES_USER: mealie
+  # Mealie lee la contraseña del fichero que deja mealie-db-alta.
+  POSTGRES_PASSWORD_FILE: /claves/postgres
+  TZ: Europe/Madrid
+
 services:
   # Alta en el PostgreSQL compartido: la primera vez genera la contraseña de la
   # aplicación; en cada despliegue crea el usuario y la base si no existen.
@@ -35,10 +47,52 @@ services:
         SELECT format('CREATE DATABASE %I OWNER %I', :'usuario', :'usuario')
           WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = :'usuario') \gexec
         REVOKE ALL ON DATABASE :"usuario" FROM PUBLIC;
+        -- Solo Mealie: al restaurar una copia desactiva las claves ajenas en su
+        -- sesión, algo que de serie solo puede hacer el superusuario.
+        GRANT SET ON PARAMETER session_replication_role TO :"usuario";
         SQL
     volumes:
       - /docker/postgres/claves:/claves-postgres:ro
       - /docker/mealie/claves:/claves
+    networks:
+      - db
+  # Traspaso único desde el Mealie anterior, que guardaba sus datos en SQLite
+  # (mealie.db): si la encuentra, pasa sus tablas al PostgreSQL compartido con
+  # el código de copias de Mealie y la renombra, para no repetirlo. Si no hay
+  # SQLite, no hace nada.
+  mealie-traspaso:
+    image: ghcr.io/mealie-recipes/mealie:v3.9.2
+    container_name: mealie-traspaso
+    depends_on:
+      mealie-db-alta:
+        condition: service_completed_successfully
+    environment: *base
+    entrypoint:
+      - bash
+      - -c
+      - |
+        set -e
+        [ -f /app/data/mealie.db ] || exit 0
+        cd /app
+        . /opt/mealie/bin/activate
+        export POSTGRES_PASSWORD="$$(cat /claves/postgres)"
+        python - <<'PY'
+        import sys
+        from sqlalchemy import create_engine, inspect
+        from mealie.core.config import get_app_settings
+        from mealie.services.backups_v2.alchemy_exporter import AlchemyExporter
+
+        destino = get_app_settings().DB_URL
+        if inspect(create_engine(destino)).has_table("alembic_version"):
+            sys.exit("La base de PostgreSQL ya tiene datos: no se traspasa mealie.db encima")
+        datos = AlchemyExporter("sqlite:////app/data/mealie.db").dump()
+        AlchemyExporter(destino).restore(datos)
+        print("Traspaso hecho:", {t: len(f) for t, f in datos.items() if t in ("recipes", "users", "shopping_lists")})
+        PY
+        mv /app/data/mealie.db /app/data/mealie.db.traspasada
+    volumes:
+      - /docker/mealie/data:/app/data
+      - /docker/mealie/claves:/claves:ro
     networks:
       - db
   mealie:
@@ -46,27 +100,18 @@ services:
     container_name: mealie
     restart: unless-stopped
     depends_on:
-      mealie-db-alta:
+      mealie-traspaso:
         condition: service_completed_successfully
     environment:
-      - TZ=Europe/Madrid
+      <<: *base
       # Usuario con el que corre: la imagen arranca como root, da sus carpetas a
       # este usuario y cambia a él.
-      - PUID=1000
-      - PGID=1000
+      PUID: "1000"
+      PGID: "1000"
       # Un solo proceso: basta para una casa y gasta menos memoria.
-      - WEB_CONCURRENCY=1
-      - MAX_WORKERS=1
-      - ALLOW_SIGNUP=true
-      # Solo admite «postgres» o «sqlite»: con cualquier otro valor usa SQLite sin
-      # avisar.
-      - DB_ENGINE=postgres
-      - POSTGRES_SERVER=postgres
-      - POSTGRES_PORT=5432
-      - POSTGRES_DB=mealie
-      - POSTGRES_USER=mealie
-      # Mealie lee la contraseña del fichero que deja mealie-db-alta.
-      - POSTGRES_PASSWORD_FILE=/claves/postgres
+      WEB_CONCURRENCY: "1"
+      MAX_WORKERS: "1"
+      ALLOW_SIGNUP: "true"
     volumes:
       # Imágenes de las recetas, copias de seguridad propias y su clave interna.
       - /docker/mealie/data:/app/data

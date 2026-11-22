@@ -1,12 +1,12 @@
 # Traductor automático compartido (LibreTranslate). Sin cuentas ni claves: los
 # textos no salen de casa. Lo usan las aplicaciones que se unen a la red
-# `traductor`, que crea este stack; no se publica por Traefik.
+# `translator`, que crea este stack; no se publica por Traefik.
 services:
   # LibreTranslate corre con su usuario (uid 1032): antes de arrancarlo, se crea
   # su carpeta de modelos y se le da si no es suya.
-  traductor-permisos:
+  translator-permisos:
     image: busybox:1.37
-    container_name: traductor-permisos
+    container_name: translator-permisos
     command:
       - sh
       - -c
@@ -14,14 +14,14 @@ services:
         mkdir -p /datos/modelos
         [ "$$(stat -c %u /datos/modelos)" = 1032 ] || chown -R 1032 /datos/modelos
     volumes:
-      - /docker/traductor:/datos
+      - /docker/translator:/datos
     network_mode: none
-  traductor:
+  translator:
     image: libretranslate/libretranslate:v1.9.6
-    container_name: traductor
+    container_name: translator
     restart: unless-stopped
     depends_on:
-      traductor-permisos:
+      translator-permisos:
         condition: service_completed_successfully
     security_opt:
       - no-new-privileges:true
@@ -32,7 +32,7 @@ services:
       - LT_LOAD_ONLY=en,es,de,fr,it,zh
     volumes:
       # Modelos de idiomas, descargados en el primer arranque.
-      - /docker/traductor/modelos:/home/libretranslate/.local
+      - /docker/translator/modelos:/home/libretranslate/.local
     healthcheck:
       test: ["CMD-SHELL", "./venv/bin/python scripts/healthcheck.py"]
       interval: 30s
@@ -40,9 +40,13 @@ services:
       retries: 3
       # La primera vez descarga los modelos antes de responder.
       start_period: 10m
+    labels:
+      # Sin web: en domo-board va en esta categoría, con el logo de LibreTranslate.
+      - domo-board.categoria=Infraestructura
+      - domo-board.icono=libretranslate.svg
     networks:
-      - traductor
+      - translator
 networks:
   # Con salida a internet: los modelos se descargan en el primer arranque.
-  traductor:
-    name: traductor
+  translator:
+    name: translator

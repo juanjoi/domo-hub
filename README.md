@@ -47,4 +47,4 @@ El dispositivo pregunta primero a Pi-hole por el nombre del servicio y después 
 | [Immich](docs/immich.md) | Base en el PostgreSQL compartido, actualizar y copias |
 | [Mealie](docs/mealie.md) | Actualizar sin perder datos y copias |
 | [PostgreSQL compartido](docs/postgres.md) | Primer despliegue, alta automática de una aplicación y cómo traer su base |
-| [Traductor](docs/traductor.md) | Traductor compartido: primer despliegue y cómo usarlo desde una aplicación |
+| [Translator](docs/translator.md) | Traductor compartido: primer despliegue y cómo usarlo desde una aplicación |

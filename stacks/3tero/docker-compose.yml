@@ -4,7 +4,7 @@
 # Base de datos en el PostgreSQL compartido, que se despliega antes. Sin .env
 # para ella: 3tero-db-alta genera la contraseña de la aplicación y le da de alta
 # su usuario y su base (ver docs/postgres.md). Usa también el traductor
-# compartido: los dos stacks se despliegan antes que este.
+# compartido (translator): los dos stacks se despliegan antes que este.
 services:
   # 3tero corre con el usuario node (uid 1000): antes de arrancarlo, se crea su
   # carpeta de ficheros y se le da si no es suya.
@@ -81,7 +81,7 @@ services:
       - NUXT_PUBLIC_PRINTER_MODEL=A1 mini
       # Traductor compartido, para «Traducir al español» al importar. Si no
       # responde, la aplicación funciona igual y el botón da un aviso.
-      - NUXT_TRANSLATE_URL=http://traductor:5000
+      - NUXT_TRANSLATE_URL=http://translator:5000
     volumes:
       # Imágenes, modelos y miniaturas de los proyectos.
       - /docker/3tero/data:/data
@@ -97,11 +97,11 @@ services:
     networks:
       - proxy
       - db
-      - traductor
+      - translator
 networks:
   proxy:
     external: true
   db:
     external: true
-  traductor:
+  translator:
     external: true

@@ -12,7 +12,7 @@ Usa el [PostgreSQL compartido](postgres.md). El stack se da de alta en él solo:
 
 ## Traducción al español
 
-Al importar un modelo, 3tero puede traducir el título, la descripción y las etiquetas al español con el [traductor compartido](traductor.md), que se despliega antes que 3tero. Si no responde, el botón de traducir da un aviso y el resto de la aplicación funciona igual.
+Al importar un modelo, 3tero puede traducir el título, la descripción y las etiquetas al español con el [traductor compartido](translator.md), que se despliega antes que 3tero. Si no responde, el botón de traducir da un aviso y el resto de la aplicación funciona igual.
 
 ## Copias
 

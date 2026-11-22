@@ -8,6 +8,10 @@ Al usuario `mealie` se le permite además desactivar las claves ajenas en su pro
 
 Venía de un stack anterior que, por un valor mal escrito en `DB_ENGINE`, guardaba los datos en SQLite. Se pasaron al compartido al migrarlo, y la SQLite quedó como `/docker/mealie/data/mealie.db.traspasada`: se borra cuando lleve unos días funcionando.
 
+## Dirección de Mealie
+
+Mealie necesita saber con qué dirección se llega a él para los enlaces de los correos y las notificaciones. Lleva el dominio de casa, que no va en Git, así que se pone en el servidor: crear `stacks/mealie/.env` a partir de `.env.example`, con `BASE_URL=http://recetas.<dominio>`, y desplegar el stack. Sin ese fichero Mealie funciona igual, pero avisa en **Ajustes** de que la dirección es la de serie.
+
 ## Actualizar
 
 Mealie actualiza su base sola al arrancar. Antes de desplegar una versión nueva:

@@ -73,6 +73,10 @@ services:
       WEB_CONCURRENCY: "1"
       MAX_WORKERS: "1"
       ALLOW_SIGNUP: "true"
+      # Dirección con la que se llega a Mealie, para los enlaces de correos y
+      # notificaciones. Lleva el dominio de casa, así que va en el .env del
+      # servidor; sin él, Mealie usa su valor de serie y avisa en Ajustes.
+      BASE_URL: ${BASE_URL:-http://localhost:8080}
     volumes:
       # Imágenes de las recetas, copias de seguridad propias y su clave interna.
       - /docker/mealie/data:/app/data

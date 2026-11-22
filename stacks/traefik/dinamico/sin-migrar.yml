@@ -17,12 +17,6 @@ http:
           categoria: Casa
           nombre: "Firefly III"
           icono: firefly-iii.svg
-    immich-menu:
-      plugin:
-        menu:
-          categoria: Media
-          nombre: "Immich"
-          icono: immich.svg
     portainer-menu:
       plugin:
         menu:
@@ -44,10 +38,6 @@ http:
       rule: HostRegexp(`^firefly\.`)
       service: firefly
       middlewares: [compress, firefly-menu]
-    immich:
-      rule: HostRegexp(`^immich\.`)
-      service: immich
-      middlewares: [compress, immich-menu]
     portainer:
       rule: HostRegexp(`^portainer\.`)
       service: portainer
@@ -69,10 +59,6 @@ http:
       loadBalancer:
         servers:
           - url: http://firefly:8080
-    immich:
-      loadBalancer:
-        servers:
-          - url: http://immich:2283
     portainer:
       loadBalancer:
         servers:

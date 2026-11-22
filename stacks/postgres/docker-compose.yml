@@ -1,0 +1,62 @@
+# PostgreSQL compartido: una base y un usuario por aplicación. Usa la imagen de
+# Immich, que trae las extensiones vectoriales que necesita (VectorChord y
+# pgvector); para el resto es un PostgreSQL normal.
+#
+# Sin .env: la contraseña del superusuario la genera postgres-clave la primera
+# vez y se queda en /docker/postgres/claves. Para administrar no hace falta:
+# dentro del contenedor, psql entra por el socket sin contraseña.
+services:
+  postgres-clave:
+    image: busybox:1.37
+    container_name: postgres-clave
+    command:
+      - sh
+      - -c
+      - |
+        set -e
+        chmod 700 /claves
+        if [ ! -s /claves/postgres ]; then
+          head -c 24 /dev/urandom | od -An -tx1 | tr -d ' \n' > /claves/postgres.nueva
+          chmod 600 /claves/postgres.nueva
+          mv /claves/postgres.nueva /claves/postgres
+        fi
+    volumes:
+      - /docker/postgres/claves:/claves
+    network_mode: none
+  postgres:
+    image: ghcr.io/immich-app/postgres:18-vectorchord1.1.1-pgvector0.8.7
+    container_name: postgres
+    restart: unless-stopped
+    depends_on:
+      postgres-clave:
+        condition: service_completed_successfully
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - TZ=Europe/Madrid
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD_FILE=/claves/postgres
+      - POSTGRES_INITDB_ARGS=--data-checksums
+    shm_size: 128mb
+    labels:
+      # Sin web: en domo-board va en esta categoría.
+      - domo-board.categoria=Infraestructura
+    volumes:
+      # La imagen guarda los datos en /var/lib/postgresql/data y declara como
+      # volumen /var/lib/postgresql: se monta entero para no dejar volúmenes
+      # anónimos.
+      - /docker/postgres/servidor:/var/lib/postgresql
+      - /docker/postgres/claves:/claves:ro
+    healthcheck:
+      # Por TCP: en el primer arranque, el servidor temporal que crea la base solo
+      # escucha por socket, y las aplicaciones no deben conectarse hasta que acabe.
+      test: ["CMD", "pg_isready", "-h", "127.0.0.1", "-U", "postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - db
+networks:
+  db:
+    name: db

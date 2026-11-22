@@ -108,6 +108,7 @@ Un servidor de base de datos da servicio a varias aplicaciones, cada una con su 
 
 - El stack de la base de datos crea la red `db`, con `name: db`, y las aplicaciones que la usan la declaran como externa. Se despliega antes que ellas.
 - Solo se unen a `db` las aplicaciones que usan esa base de datos. La base de datos no está en `proxy` ni publica puertos.
+- Sin `.env`: el stack del servidor genera la contraseña del superusuario, y el de cada aplicación, la suya, y da de alta su usuario y su base con un contenedor de preparación (ver [PostgreSQL compartido](postgres.md#dar-de-alta-una-aplicación)).
 - Las copias hacen un volcado por base de datos, para poder restaurar una aplicación sin tocar las demás.
 - Las aplicaciones con base de datos embebida (SQLite) no usan `db`.
 

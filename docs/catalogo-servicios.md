@@ -15,6 +15,7 @@ Servicios definidos en este repositorio. Cada servicio se añade como una fila m
 | Zigbee2MQTT | Administración | Puente entre los dispositivos Zigbee y MQTT |
 | Mosquitto (MQTT) | Infraestructura | Bus de mensajes entre Zigbee2MQTT y Home Assistant |
 | Asistente de voz | Infraestructura | Whisper (voz a texto) y Piper (texto a voz) para Assist ([puesta en marcha](asistente-voz.md)) |
+| PostgreSQL | Infraestructura | Base de datos compartida, una base por aplicación ([puesta en marcha](postgres.md)) |
 
 Categorías: **Casa**, **Media**, **Administración**, **Infraestructura**. Administración es lo que se gestiona a mano, como el proxy, el panel o Zigbee2MQTT; Infraestructura, los servicios de fondo de los que dependen los demás.
 

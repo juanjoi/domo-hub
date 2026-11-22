@@ -22,8 +22,8 @@ services:
       - /docker/3tero:/datos
     network_mode: none
   3tero-db:
-    # Misma versión mayor que el PostgreSQL compartido, para pasar la base sin
-    # cambiar de versión.
+    # Temporal: al pasar al compartido, el volcado de esta versión se restaura
+    # allí aunque tenga una más nueva.
     image: postgres:17.6-alpine
     container_name: 3tero-db
     restart: unless-stopped

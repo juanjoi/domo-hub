@@ -58,7 +58,7 @@ services:
     networks:
       - db
   3tero:
-    image: ghcr.io/juanjoi/3tero:1.3.1
+    image: ghcr.io/juanjoi/3tero:1.3.2
     container_name: 3tero
     restart: unless-stopped
     depends_on:

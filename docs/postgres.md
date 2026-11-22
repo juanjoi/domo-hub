@@ -20,7 +20,7 @@ Solo la usan los contenedores que dan de alta las aplicaciones, que llegan por l
 
 ## Dar de alta una aplicación
 
-El stack de cada aplicación da de alta su base él solo, al desplegarse, con un contenedor de preparación (ver el de 3tero cuando pase al compartido). Ese contenedor:
+El stack de cada aplicación da de alta su base él solo, al desplegarse, con un contenedor de preparación (ver el de 3tero). Ese contenedor:
 
 1. Genera la contraseña de la aplicación la primera vez, en `/docker/<aplicacion>/claves`, legible solo por el usuario con el que corre la aplicación.
 2. Entra en el compartido como superusuario, con la contraseña de `/docker/postgres/claves`, que monta solo para leer.

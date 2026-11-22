@@ -6,30 +6,17 @@ Usa el [PostgreSQL compartido](postgres.md). El stack se da de alta en él solo:
 
 Firefly cifra los adjuntos y algunas preferencias con su clave, `APP_KEY`, guardada también en `/docker/firefly/claves`. No puede cambiar: con otra clave, lo ya cifrado no se puede leer. Es la clave de ejemplo de Firefly, la que tenía la instalación anterior.
 
-## Traer Firefly desde su stack anterior
+Venía de un stack con MariaDB: sus datos se pasaron al compartido al migrarlo, con pgloader, sobre las tablas creadas por las migraciones de Firefly. Cuando lleve unos días funcionando, se borran `/docker/firefly/traspaso` y la base `fireflyiii` de MariaDB, que se va con ella en la limpieza final.
 
-El Firefly anterior guardaba sus datos en MariaDB. El stack los pasa solo al compartido si encuentra un volcado en `/docker/firefly/traspaso/firefly.sql`:
+## Actualizar
 
-1. `firefly-mariadb` carga el volcado en una MariaDB que solo vive en memoria.
-2. `firefly-esquema` crea las tablas en PostgreSQL con las migraciones de Firefly, como en una instalación nueva.
-3. `firefly-traspaso` copia los datos de una a otra con pgloader, deja la marca `traspaso/hecho` y renombra el volcado a `firefly.sql.restaurado`. Con la marca, los despliegues siguientes no hacen nada.
+Firefly actualiza su base solo al arrancar. Antes de cambiar de versión, leer las notas de las versiones intermedias.
 
-Pasos:
+Desde la 6.7, las claves de API personales necesitan un cliente propio de Passport, que la instalación anterior no tenía. Si hace falta crear una clave en **Opciones → Perfil → OAuth**, se crea una vez por SSH:
 
-1. **Parar Firefly** en Portainer (`firefly_iii_core` y `firefly_iii_importer`), dejando MariaDB en marcha.
-2. **Volcar la base** por SSH, con el usuario y la contraseña del stack anterior:
-
-   ```bash
-   sudo mkdir -p /docker/firefly/traspaso
-   sudo docker exec mariadb mariadb-dump -u<usuario> -p<contraseña> --single-transaction fireflyiii | sudo tee /docker/firefly/traspaso/firefly.sql > /dev/null
-   ```
-
-3. **Quitar el stack anterior** en Portainer, sin borrar volúmenes.
-4. **Desplegar el stack** `firefly`. El log de `firefly-traspaso` termina con un resumen de las filas copiadas.
-5. **Desplegar el stack de Traefik,** que ya no declara las rutas de Firefly y su importador entre las rutas sin migrar: ahora las publican las etiquetas del stack.
-6. Entrar con la cuenta de siempre y comprobar los saldos de las cuentas, algunos movimientos y un adjunto.
-
-Pasados unos días con todo funcionando, se borra la base `fireflyiii` de MariaDB, que se va con ella en la limpieza final, y `/docker/firefly/traspaso`.
+```bash
+sudo docker exec firefly php artisan passport:client --personal --provider=users --name="Firefly III Personal Access Client" --no-interaction
+```
 
 ## Importador
 

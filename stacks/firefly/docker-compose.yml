@@ -4,7 +4,7 @@
 # firefly-db-alta genera la contraseña de la aplicación y le da de alta su
 # usuario y su base (ver docs/postgres.md y docs/firefly.md).
 
-# Conexión a la base, la misma para firefly y firefly-esquema.
+# Conexión a la base.
 x-base: &base
   DB_CONNECTION: pgsql
   DB_HOST: postgres
@@ -66,92 +66,12 @@ services:
     networks:
       - db
 
-  # Traspaso único desde el Firefly anterior, que usaba MariaDB. Solo actúa si
-  # hay un volcado en /docker/firefly/traspaso/firefly.sql y aún no se ha hecho:
-  #   1. firefly-mariadb carga el volcado en una MariaDB solo en memoria.
-  #   2. firefly-esquema crea las tablas en PostgreSQL con las migraciones de
-  #      Firefly, las mismas que en una instalación nueva.
-  #   3. firefly-traspaso copia los datos de una a otra con pgloader, deja la
-  #      marca traspaso/hecho y renombra el volcado.
-  firefly-mariadb:
-    image: mariadb:11
-    container_name: firefly-mariadb
-    environment:
-      MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: "1"
-      MARIADB_DATABASE: fireflyiii
-    tmpfs:
-      - /var/lib/mysql
-    volumes:
-      - /docker/firefly/traspaso:/docker-entrypoint-initdb.d:ro
-    healthcheck:
-      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
-      interval: 5s
-      timeout: 5s
-      retries: 60
-      start_period: 30s
-    networks:
-      - firefly
-  firefly-esquema:
-    image: fireflyiii/core:version-6.1.21
-    container_name: firefly-esquema
-    depends_on:
-      firefly-db-alta:
-        condition: service_completed_successfully
-    environment: *base
-    entrypoint:
-      - bash
-      - -c
-      - |
-        set -e
-        if [ ! -f /traspaso/firefly.sql ] || [ -f /traspaso/hecho ]; then exit 0; fi
-        export DB_PASSWORD="$$(cat /claves/postgres)" APP_KEY="$$(cat /claves/app-key)"
-        unset DB_PASSWORD_FILE APP_KEY_FILE
-        cd /var/www/html
-        php artisan migrate:fresh --force
-    volumes:
-      - /docker/firefly/traspaso:/traspaso:ro
-      - /docker/firefly/claves:/claves:ro
-    networks:
-      - db
-  firefly-traspaso:
-    image: ghcr.io/dimitri/pgloader:latest
-    container_name: firefly-traspaso
-    depends_on:
-      firefly-esquema:
-        condition: service_completed_successfully
-      firefly-mariadb:
-        condition: service_healthy
-    entrypoint:
-      - sh
-      - -c
-      - |
-        set -e
-        if [ ! -f /traspaso/firefly.sql ] || [ -f /traspaso/hecho ]; then exit 0; fi
-        cat > /tmp/traspaso.load <<EOF
-        LOAD DATABASE
-          FROM mysql://root@firefly-mariadb/fireflyiii
-          INTO postgresql://postgres:$$(cat /claves-postgres/postgres)@postgres/firefly
-        WITH data only, truncate, disable triggers, reset sequences,
-             quote identifiers, no foreign keys, create no indexes,
-             workers = 2, concurrency = 1
-        ALTER SCHEMA 'fireflyiii' RENAME TO 'public';
-        EOF
-        pgloader --on-error-stop /tmp/traspaso.load
-        touch /traspaso/hecho
-        mv /traspaso/firefly.sql /traspaso/firefly.sql.restaurado
-    volumes:
-      - /docker/postgres/claves:/claves-postgres:ro
-      - /docker/firefly/traspaso:/traspaso
-    networks:
-      - db
-      - firefly
-
   firefly:
-    image: fireflyiii/core:version-6.1.21
+    image: fireflyiii/core:version-6.7.9
     container_name: firefly
     restart: unless-stopped
     depends_on:
-      firefly-traspaso:
+      firefly-db-alta:
         condition: service_completed_successfully
     environment:
       <<: *base

@@ -43,7 +43,7 @@ El dispositivo pregunta primero a Pi-hole por el nombre del servicio y después 
 | [Home Assistant](docs/homeassistant.md) | Primer arranque y conexión con Zigbee2MQTT |
 | [Asistente de voz](docs/asistente-voz.md) | Assist con voz local: puesta en marcha y preguntas propias |
 | [3tero](docs/3tero.md) | Primer despliegue sobre el PostgreSQL compartido |
-| [Firefly III](docs/firefly.md) | Traspaso desde MariaDB, importador y copias |
+| [Firefly III](docs/firefly.md) | Importador, claves de API, actualizar y copias |
 | [Immich](docs/immich.md) | Base en el PostgreSQL compartido, actualizar y copias |
 | [Mealie](docs/mealie.md) | Actualizar sin perder datos y copias |
 | [PostgreSQL compartido](docs/postgres.md) | Primer despliegue, alta automática de una aplicación y cómo traer su base |

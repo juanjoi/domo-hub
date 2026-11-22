@@ -5,18 +5,6 @@
 http:
   middlewares:
     # Menú común de cada ruta: categoría, nombre e icono (ver stacks/domo-menu).
-    firefly-importer-menu:
-      plugin:
-        menu:
-          categoria: Casa
-          nombre: "Importador de Firefly"
-          icono: firefly-iii.svg
-    firefly-menu:
-      plugin:
-        menu:
-          categoria: Casa
-          nombre: "Firefly III"
-          icono: firefly-iii.svg
     portainer-menu:
       plugin:
         menu:
@@ -30,14 +18,6 @@ http:
           nombre: "What's Up Docker"
           icono: whats-up-docker.svg
   routers:
-    firefly-importer:
-      rule: HostRegexp(`^firefly-importer\.`)
-      service: firefly-importer
-      middlewares: [compress, firefly-importer-menu]
-    firefly:
-      rule: HostRegexp(`^firefly\.`)
-      service: firefly
-      middlewares: [compress, firefly-menu]
     portainer:
       rule: HostRegexp(`^portainer\.`)
       service: portainer
@@ -51,14 +31,6 @@ http:
       service: wud
       middlewares: [compress, wud-menu]
   services:
-    firefly-importer:
-      loadBalancer:
-        servers:
-          - url: http://firefly-importer:8080
-    firefly:
-      loadBalancer:
-        servers:
-          - url: http://firefly:8080
     portainer:
       loadBalancer:
         servers:

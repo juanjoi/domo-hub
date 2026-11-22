@@ -4,6 +4,7 @@ Servicios definidos en este repositorio. Cada servicio se añade como una fila m
 
 | Servicio | Categoría | Propósito |
 | --- | --- | --- |
+| Firefly III | Casa | Finanzas de la familia, con su importador de datos ([puesta en marcha](firefly.md)) |
 | Home Assistant | Casa | Control de la casa ([puesta en marcha](homeassistant.md)) |
 | Mealie | Casa | Recetas, menú semanal y lista de la compra; se publica como «recetas» ([puesta en marcha](mealie.md)) |
 | Quereseres | Casa | Tareas pendientes de casa en tableros kanban |

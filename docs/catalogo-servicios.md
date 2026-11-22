@@ -16,6 +16,7 @@ Servicios definidos en este repositorio. Cada servicio se añade como una fila m
 | Mosquitto (MQTT) | Infraestructura | Bus de mensajes entre Zigbee2MQTT y Home Assistant |
 | Asistente de voz | Infraestructura | Whisper (voz a texto) y Piper (texto a voz) para Assist ([puesta en marcha](asistente-voz.md)) |
 | PostgreSQL | Infraestructura | Base de datos compartida, una base por aplicación ([puesta en marcha](postgres.md)) |
+| Traductor | Infraestructura | Traducción automática en casa con LibreTranslate; lo usa 3tero ([puesta en marcha](traductor.md)) |
 
 Categorías: **Casa**, **Media**, **Administración**, **Infraestructura**. Administración es lo que se gestiona a mano, como el proxy, el panel o Zigbee2MQTT; Infraestructura, los servicios de fondo de los que dependen los demás.
 

@@ -12,11 +12,7 @@ Usa el [PostgreSQL compartido](postgres.md). El stack se da de alta en él solo:
 
 ## Traducción al español
 
-Al importar un modelo, 3tero puede traducir el título, la descripción y las etiquetas al español con `3tero-traductor`, un LibreTranslate que va en el mismo stack. No necesita cuentas ni claves y los textos no salen de casa.
-
-- En el primer despliegue descarga los modelos de idiomas (inglés, español, alemán, francés, italiano y chino) en `/docker/3tero/traductor`: un par de GB y varios minutos. Mientras tanto, el botón de traducir da un aviso y el resto de la aplicación funciona igual.
-- Va con el procesador: una descripción larga tarda en torno a medio minuto, y la primera traducción tras arrancar, algo más.
-- Para añadir un idioma, se añade su código a `LT_LOAD_ONLY` y se despliega el stack.
+Al importar un modelo, 3tero puede traducir el título, la descripción y las etiquetas al español con el [traductor compartido](traductor.md), que se despliega antes que 3tero. Si no responde, el botón de traducir da un aviso y el resto de la aplicación funciona igual.
 
 ## Copias
 

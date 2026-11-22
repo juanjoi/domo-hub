@@ -62,45 +62,12 @@ services:
       - /docker/immich/claves:/claves
     networks:
       - db
-  # Traspaso único desde el Immich anterior: si encuentra un volcado de su base
-  # en /docker/immich/traspaso.dump y la base del compartido aún no tiene
-  # tablas, lo restaura y lo renombra, para no repetirlo. Sin volcado, no hace
-  # nada.
-  immich-traspaso:
-    image: ghcr.io/immich-app/postgres:18-vectorchord1.1.1-pgvector0.8.7
-    container_name: immich-traspaso
-    depends_on:
-      immich-db-alta:
-        condition: service_completed_successfully
-    entrypoint:
-      - sh
-      - -c
-      - |
-        set -e
-        [ -f /traspaso/traspaso.dump ] || exit 0
-        export PGHOST=postgres PGUSER=postgres PGPASSWORD="$$(cat /claves-postgres/postgres)"
-        tablas=$$(psql -tAq -d immich -c "SELECT count(*) FROM pg_tables WHERE schemaname = 'public'")
-        if [ "$$tablas" != 0 ]; then
-          echo "La base immich ya tiene tablas: no se restaura el volcado encima" >&2
-          exit 1
-        fi
-        # Sin los comentarios de las extensiones: las crea immich-db-alta y solo
-        # su dueño, el superusuario, puede comentarlas.
-        pg_restore -l /traspaso/traspaso.dump | grep -v ' COMMENT - EXTENSION ' > /tmp/lista
-        pg_restore -d immich --no-owner --role=immich --exit-on-error -L /tmp/lista /traspaso/traspaso.dump
-        echo "Traspaso hecho: $$(psql -tAq -d immich -c 'SELECT count(*) FROM asset') fotos y vídeos"
-        mv /traspaso/traspaso.dump /traspaso/traspaso.dump.restaurado
-    volumes:
-      - /docker/postgres/claves:/claves-postgres:ro
-      - /docker/immich:/traspaso
-    networks:
-      - db
   immich:
-    image: ghcr.io/immich-app/immich-server:v2.5.6
+    image: ghcr.io/immich-app/immich-server:v3.4.2
     container_name: immich
     restart: unless-stopped
     depends_on:
-      immich-traspaso:
+      immich-db-alta:
         condition: service_completed_successfully
       immich-redis:
         condition: service_healthy
@@ -131,11 +98,14 @@ services:
   # Reconocimiento de caras y búsqueda por contenido, en la CPU. Descarga sus
   # modelos de internet la primera vez y los guarda en model-cache.
   immich-machine-learning:
-    image: ghcr.io/immich-app/immich-machine-learning:v2.5.6
+    image: ghcr.io/immich-app/immich-machine-learning:v3.4.2
     container_name: immich-machine-learning
     restart: unless-stopped
     environment:
       - TZ=Europe/Madrid
+      # Los mismos modelos en un formato más rápido y que gasta menos memoria;
+      # dan los mismos resultados, sin volver a procesar nada.
+      - MACHINE_LEARNING_MODEL_REVISION=v2
     volumes:
       - /docker/immich/model-cache:/cache
     networks:

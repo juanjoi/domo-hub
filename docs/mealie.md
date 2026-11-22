@@ -6,19 +6,16 @@ Usa el [PostgreSQL compartido](postgres.md). El stack se da de alta en él solo:
 
 Al usuario `mealie` se le permite además desactivar las claves ajenas en su propia sesión, algo que de serie solo puede el superusuario: Mealie lo necesita para restaurar sus copias de seguridad.
 
-## Traer Mealie desde su stack anterior
+Venía de un stack anterior que, por un valor mal escrito en `DB_ENGINE`, guardaba los datos en SQLite. Se pasaron al compartido al migrarlo, y la SQLite quedó como `/docker/mealie/data/mealie.db.traspasada`: se borra cuando lleve unos días funcionando.
 
-El Mealie anterior guardaba sus datos en SQLite, en `/docker/mealie/data/mealie.db`: tenía `DB_ENGINE=postgresql`, un valor que Mealie no reconoce, y sin avisar usaba SQLite. El stack trae los datos solo: `mealie-traspaso`, antes de arrancar Mealie, pasa las tablas de la SQLite al compartido con el código de copias de la propia Mealie y la renombra a `mealie.db.traspasada`. Sin SQLite, no hace nada. Si la base del compartido ya tiene datos, falla avisando en vez de escribir encima.
+## Actualizar
 
-1. **Copia de seguridad**, por si hay que volver atrás: en el Mealie anterior, **Ajustes → Copias de seguridad**, crear una y descargarla.
-2. **Quitar el stack anterior** en Portainer, sin borrar volúmenes.
-3. **Desplegar el stack** `mealie`. El log de `mealie-traspaso` dice cuántas recetas, usuarios y listas ha pasado.
-4. **Desplegar el stack de Traefik,** que ya no declara la ruta de Mealie entre las rutas sin migrar: ahora la publican las etiquetas del stack.
-5. Entrar con las cuentas de siempre y comprobar las recetas con sus fotos y la lista de la compra.
+Mealie actualiza su base sola al arrancar. Antes de desplegar una versión nueva:
 
-Pasados unos días con todo funcionando, se borra `/docker/mealie/data/mealie.db.traspasada`. La base `mealie` del PostgreSQL antiguo estaba vacía y se va con él.
+1. Crear una copia en **Ajustes → Copias de seguridad**. Si algo sale mal, se vuelve a la versión anterior en el stack y se restaura esa copia.
+2. Leer las notas de las versiones intermedias: los cambios que piden tocar la configuración vienen marcados como *breaking changes* o *things to know when upgrading*.
 
-Para volver atrás: renombrar `mealie.db.traspasada` a `mealie.db` y volver a crear el stack anterior en Portainer.
+Desde la 3.26, Mealie solo hace peticiones a direcciones de internet: importar recetas, descargar imágenes, webhooks y acciones de recetas. Si alguno tuviera que llegar a un servicio de casa, hay que permitirlo con `HTTP_ALLOW_LIST`.
 
 ## Copias
 

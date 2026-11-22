@@ -20,7 +20,7 @@ Este repositorio es la fuente de verdad: lo que está en `main` es lo que debe c
      ```bash
      cd <clon del repositorio> && sudo git fetch
      sudo git restore --source=origin/main --worktree -- stacks/<servicio>/
-     sudo docker compose -f stacks/<servicio>/docker-compose.yml up -d
+     sudo DOMINIO=<dominio de casa> docker compose -f stacks/<servicio>/docker-compose.yml up -d
      ```
 
    Todo con `sudo`: el panel corre como root y parte del clon es suyo. No se hace `git pull`: solo se actualiza la carpeta del stack que se despliega, igual que hace el panel. Con `git pull` cambiarían a la vez los ficheros de todos los stacks, y algunos, como las rutas de Traefik, se aplican al momento.
@@ -64,6 +64,17 @@ Los servicios publicados comparten la red `proxy`, para que Traefik los alcance 
 - La red `traductor` la crea el stack del [traductor](traductor.md). En ella están el traductor y las aplicaciones que traducen, como 3tero.
 - La red `voice` la crea el stack de los servicios de voz. En ella están esos servicios y Home Assistant, que es el único que habla con ellos; por eso no están en `proxy`.
 - Durante la migración, Traefik también está en `services`, la red compartida anterior, para seguir llegando a los servicios que aún no se han migrado. Esos servicios se declaran en `stacks/traefik/dinamico/`. Cada servicio migrado pasa a `proxy` y a sus propias etiquetas.
+
+## Dominio de casa
+
+El dominio de casa no está en Git. Las reglas de Traefik solo miran el principio del nombre, y si un servicio necesita su dirección completa (para enlaces en correos o notificaciones, por ejemplo), la compone con la variable `DOMINIO`: domo-board la pasa al desplegar, con el dominio desde el que se abrió el panel.
+
+```yaml
+    environment:
+      BASE_URL: ${DOMINIO:+http://<servicio>.${DOMINIO}}
+```
+
+Si se despliega abriendo el panel por IP o por un túnel SSH, `DOMINIO` llega vacía: el servicio tiene que seguir arrancando, con su valor de serie. Por SSH se pasa a mano, como en [desplegar un cambio](#desplegar-un-cambio).
 
 ## Publicar un servicio
 

@@ -63,6 +63,12 @@ services:
     depends_on:
       mealie-db-alta:
         condition: service_completed_successfully
+    # Sin DOMINIO, BASE_URL llega vacía y Mealie se quedaría sin dirección: se
+    # quita, para que use la de serie y avise en Ajustes.
+    entrypoint:
+      - sh
+      - -c
+      - '[ -n "$$BASE_URL" ] || unset BASE_URL; exec /app/run.sh'
     environment:
       <<: *base
       # Usuario con el que corre: la imagen arranca como root, da sus carpetas a
@@ -74,9 +80,9 @@ services:
       MAX_WORKERS: "1"
       ALLOW_SIGNUP: "true"
       # Dirección con la que se llega a Mealie, para los enlaces de correos y
-      # notificaciones. Lleva el dominio de casa, así que va en el .env del
-      # servidor; sin él, Mealie usa su valor de serie y avisa en Ajustes.
-      BASE_URL: ${BASE_URL:-http://localhost:8080}
+      # notificaciones. El dominio de casa no está en Git: lo pasa domo-board
+      # al desplegar, como DOMINIO (ver docs/operacion.md).
+      BASE_URL: ${DOMINIO:+http://recetas.${DOMINIO}}
     volumes:
       # Imágenes de las recetas, copias de seguridad propias y su clave interna.
       - /docker/mealie/data:/app/data

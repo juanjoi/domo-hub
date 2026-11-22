@@ -10,7 +10,7 @@ Venía de un stack anterior que, por un valor mal escrito en `DB_ENGINE`, guarda
 
 ## Dirección de Mealie
 
-Mealie necesita saber con qué dirección se llega a él para los enlaces de los correos y las notificaciones. Lleva el dominio de casa, que no va en Git, así que se pone en el servidor: crear `stacks/mealie/.env` a partir de `.env.example`, con `BASE_URL=http://recetas.<dominio>`, y desplegar el stack. Sin ese fichero Mealie funciona igual, pero avisa en **Ajustes** de que la dirección es la de serie.
+Mealie necesita saber con qué dirección se llega a él para los enlaces de los correos y las notificaciones. La compone con el dominio de casa que domo-board pasa al desplegar (ver [dominio de casa](operacion.md#dominio-de-casa)). Si se despliega sin él, Mealie usa su valor de serie y avisa en **Ajustes**: basta con volver a desplegar desde el panel abierto por su nombre.
 
 ## Actualizar
 

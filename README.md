@@ -46,5 +46,6 @@ El dispositivo pregunta primero a Pi-hole por el nombre del servicio y después 
 | [Firefly III](docs/firefly.md) | Importador, claves de API, actualizar y copias |
 | [Immich](docs/immich.md) | Base en el PostgreSQL compartido, actualizar y copias |
 | [Mealie](docs/mealie.md) | Actualizar sin perder datos y copias |
+| [Pi-hole](docs/pihole.md) | DNS de casa: las reglas de los dominios internos, que se preparan a mano, y cómo desplegarlo sin dejar la casa sin DNS |
 | [PostgreSQL compartido](docs/postgres.md) | Primer despliegue, alta automática de una aplicación y cómo traer su base |
 | [Translator](docs/translator.md) | Traductor compartido: primer despliegue y cómo usarlo desde una aplicación |

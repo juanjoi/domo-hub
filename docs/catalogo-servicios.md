@@ -12,6 +12,7 @@ Servicios definidos en este repositorio. Cada servicio se añade como una fila m
 | Immich | Media | Fotos y vídeos de la familia ([puesta en marcha](immich.md)) |
 | Jellyfin | Media | Películas y series |
 | File Browser | Media | Acceso web a los ficheros compartidos |
+| Pi-hole | Infraestructura | DNS de casa: nombres de los servicios y bloqueo de publicidad. Sus reglas de dominios se preparan a mano ([puesta en marcha](pihole.md)) |
 | Traefik | Administración | Proxy inverso: recibe las peticiones web y las reparte según el nombre |
 | domo-board | Administración | Panel para actualizar los stacks con un botón |
 | domo-menu | Infraestructura | Menú común: botón en el borde de cada aplicación web que abre la lista de aplicaciones |

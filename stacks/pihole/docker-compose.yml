@@ -1,0 +1,47 @@
+# DNS de casa (Pi-hole): resuelve los nombres internos y bloquea publicidad.
+# Si se para, la casa se queda sin DNS: ver docs/pihole.md antes de tocarlo.
+#
+# Requisito fuera de Git: las reglas de los dominios internos llevan IPs y
+# dominios de casa, así que viven solo en el servidor, en /docker/pihole/dnsmasq.d.
+# pihole-requisitos comprueba que están antes de arrancar.
+services:
+  pihole-requisitos:
+    image: busybox:1.37
+    container_name: pihole-requisitos
+    command:
+      - sh
+      - -c
+      - |
+        if ! grep -qs '^address=/' /dnsmasq.d/*.conf; then
+          echo "Faltan las reglas de los dominios internos en /docker/pihole/dnsmasq.d (ver docs/pihole.md)" >&2
+          exit 1
+        fi
+    volumes:
+      - /docker/pihole/dnsmasq.d:/dnsmasq.d:ro
+    network_mode: none
+  pihole:
+    # Misma versión que la instalación anterior (Core 5.17.3, FTL 5.25.1). La 6
+    # cambia la configuración por completo: se actualiza aparte.
+    image: pihole/pihole:2024.02.2
+    container_name: pihole
+    restart: unless-stopped
+    depends_on:
+      pihole-requisitos:
+        condition: service_completed_successfully
+    environment:
+      - TZ=Europe/Madrid
+      # Sin WEBPASSWORD: se conserva la contraseña de la web guardada en
+      # setupVars.conf. Los servidores DNS de salida también salen de ahí.
+    ports:
+      - 53:53/tcp
+      - 53:53/udp
+    volumes:
+      # Configuración, listas de bloqueo y estadísticas.
+      - /docker/pihole/pihole:/etc/pihole
+      # Configuración de dnsmasq: la que genera Pi-hole y las reglas de los
+      # dominios internos, puestas a mano en el servidor.
+      - /docker/pihole/dnsmasq.d:/etc/dnsmasq.d
+    labels:
+      # Sin publicar por Traefik: en domo-board va en esta categoría.
+      - domo-board.categoria=Infraestructura
+      - domo-board.icono=pi-hole.svg

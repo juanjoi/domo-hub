@@ -47,7 +47,7 @@ Todo cambio pasa por Git, salvo los secretos. Lo que se edite a mano en el servi
 ## Reglas de los stacks
 
 - **Datos** en bind mounts con ruta absoluta bajo `/docker/<servicio>`. Los volúmenes con nombre quedan para lo que se puede volver a descargar.
-- **Sin preparar nada a mano:** un stack se despliega desde el panel sin entrar al servidor. Si la imagen no corre como root y necesita que sus carpetas sean de su usuario, el stack incluye un contenedor de preparación que las crea y les da dueño antes de arrancar la aplicación (ver el de File Browser). Lo único que se prepara a mano son los `.env`.
+- **Sin preparar nada a mano:** un stack se despliega desde el panel sin entrar al servidor. Si la imagen no corre como root y necesita que sus carpetas sean de su usuario, el stack incluye un contenedor de preparación que las crea y les da dueño antes de arrancar la aplicación (ver el de File Browser). Lo único que se prepara a mano son los `.env` y las reglas de los dominios internos de [Pi-hole](pihole.md#requisito-las-reglas-de-los-dominios-internos), que llevan IPs y dominios de casa.
 - **Versiones fijas** en las imágenes, no `latest` ni `stable`.
 - **Secretos** en `.env`, con un `.env.example` versionado que lista los nombres.
 - **Nombres de contenedor** claros y únicos, porque Traefik los usa para encontrarlos.

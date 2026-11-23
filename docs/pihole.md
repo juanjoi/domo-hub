@@ -26,11 +26,15 @@ La primera vez, al migrarlo desde Portainer, el contenedor anterior se llama igu
 cd /docker/domo-hub && sudo git fetch
 sudo git restore --source=origin/main --worktree -- stacks/pihole/
 sudo docker compose -f stacks/pihole/docker-compose.yml pull
-sudo docker rm -f pihole
+```
+
+Con la imagen ya descargada, se borra el stack anterior en Portainer, sin borrar volúmenes, y enseguida se levanta el nuevo:
+
+```bash
 sudo docker compose -f stacks/pihole/docker-compose.yml up -d
 ```
 
-Después se espera a que salga como `healthy` (`sudo docker ps --filter name=pihole`) y se borra el stack anterior en Portainer, sin borrar volúmenes.
+El orden importa: el stack de Portainer y el nuevo comparten nombre de proyecto, `pihole`, así que borrar el de Portainer después se lleva también el contenedor nuevo. Al final se espera a que salga como `healthy` (`sudo docker ps --filter name=pihole`).
 
 ## Actualizar
 

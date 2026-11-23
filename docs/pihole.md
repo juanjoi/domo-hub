@@ -18,7 +18,7 @@ Para cambiar una regla, se edita su fichero y se despliega el stack de nuevo.
 
 ## Desplegar
 
-Desplegar el stack recrea el contenedor, y mientras arranca, unos segundos, no hay DNS. La imagen se descarga antes de parar el anterior, así que el corte es corto. Si Pi-hole no vuelve, se pone a mano un DNS público en el equipo desde el que se arregla.
+Desplegar el stack recrea el contenedor, y mientras arranca no hay DNS: hasta un minuto, aunque Docker lo dé por arrancado antes. Tampoco para el propio servidor, que resuelve a través de Tailscale, y Tailscale a través de Pi-hole: en ese minuto fallan `git fetch` y las descargas de imágenes. Se espera a que el contenedor salga como `healthy` antes de desplegar otra cosa. La imagen se descarga antes de parar el anterior, así que el corte se limita al arranque. Si Pi-hole no vuelve, se pone a mano un DNS público en el equipo desde el que se arregla.
 
 La primera vez, al migrarlo desde Portainer, el contenedor anterior se llama igual y ocupa el mismo puerto. Para que el corte sea lo más corto posible, se hace por SSH en lugar de con el panel, que necesita DNS para descargar el repositorio:
 
@@ -30,7 +30,7 @@ sudo docker rm -f pihole
 sudo docker compose -f stacks/pihole/docker-compose.yml up -d
 ```
 
-Después se borra el stack anterior en Portainer, sin borrar volúmenes.
+Después se espera a que salga como `healthy` (`sudo docker ps --filter name=pihole`) y se borra el stack anterior en Portainer, sin borrar volúmenes.
 
 ## Actualizar
 

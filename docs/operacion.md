@@ -103,7 +103,7 @@ Cada servicio publicado declara en su `docker-compose.yml` cómo lo publica Trae
 
 ## Menú común
 
-Las aplicaciones con el middleware `menu` muestran en un borde de la pantalla un botón que abre la lista de aplicaciones, y aparecen en esa lista. Ponerlo en un servicio es todo lo que hace falta; quitarlo lo saca del menú. Lo llevan todos los servicios publicados salvo Vaultwarden: en el gestor de contraseñas no se inserta ningún script ajeno.
+Las aplicaciones con el middleware `menu` muestran en un borde de la pantalla un botón que abre la lista de aplicaciones, y aparecen en esa lista. Ponerlo en un servicio es todo lo que hace falta; quitarlo lo saca del menú. Lo llevan todos los servicios publicados. Una aplicación que no deba cargar scripts ajenos, como un gestor de contraseñas, se queda sin él.
 
 - **Categoría, nombre e icono**: cada servicio tiene su propia instancia del middleware del menú (`<servicio>-menu`) con esas tres opciones, como en el ejemplo de [publicar un servicio](#publicar-un-servicio). Las rutas sin migrar las declaran en `dinamico/sin-migrar.yml`. Las categorías posibles, y su orden, están en el stack de `domo-menu`; un servicio sin categoría sale al final, en «Otras».
 - **Iconos**: en `stacks/domo-menu/iconos/`, descargados de un catálogo libre (ver su `LEEME.md`). Un icono nuevo llega al desplegar el stack de `domo-menu`.

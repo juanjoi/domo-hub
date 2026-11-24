@@ -22,10 +22,6 @@ http:
       rule: HostRegexp(`^portainer\.`)
       service: portainer
       middlewares: [compress, portainer-menu]
-    # Sin menú: en el gestor de contraseñas no se inserta ningún script ajeno.
-    vaultwarden:
-      rule: HostRegexp(`^vaultwarden\.`)
-      service: vaultwarden
     wud:
       rule: HostRegexp(`^wud\.`)
       service: wud
@@ -35,10 +31,6 @@ http:
       loadBalancer:
         servers:
           - url: http://portainer:9000
-    vaultwarden:
-      loadBalancer:
-        servers:
-          - url: http://vaultwarden:80
     wud:
       loadBalancer:
         servers:
